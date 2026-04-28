@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oops, 100 Stress</title>
+<style>
+/* CSS变量配置：主题色 */
+:root{
+  --accent:#ffc857; --accent2:#8ee28e; --danger:#ff6b6b;
+}
+*{box-sizing:border-box} 
+
+body {
+  margin:0;
+  /* 背景图片设置 */
+  background: url('UIII/background.png') center/cover no-repeat #0b0f17;
+  font-family: 'Comic Sans MS', system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  overflow:hidden;
+}
+
+#app {
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background: none; 
+}
+
+/* 顶部状态栏：移除灰底，保持大号字体 */
+.topbar { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  position: relative; 
+  height: 75px; 
+  background: transparent; 
+  z-index: 5;
+  padding: 0 20px;
+}
+.center-hud { display: flex; gap: 35px; align-items: center; }
+.right-hud { position: absolute; right: 30px; display: flex; gap: 20px; align-items: center; }
+.pill { 
+  background: transparent; 
+  padding: 0; 
+  font-size: 22px; 
+  color: #fff; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  text-shadow: 2px 2px 5px #000; 
+  font-weight: bold;
+}
+.pill b { color: #ffc857; font-weight: 900; font-size: 24px; }
+.icon-btn { 
+  background: transparent; border: none; font-size: 30px; 
+  cursor: pointer; padding: 0; text-shadow: 2px 2px 5px #000; 
+  transition: transform 0.2s;
+}
+.icon-btn:hover { transform: scale(1.1); }
+
+/* 主体内容三栏布局 */
+.main { flex:1; display:grid; grid-template-columns: 300px 1fr 330px; min-height:0; position:relative; }
+
+.side { padding:16px; overflow:auto; background:transparent; }
+.right { padding-right:24px; }
+.card { 
+  background: rgba(245, 243, 238, 0.95); 
+  border: 1px solid #dcd5c6; 
+  padding: 12px; 
+  margin-bottom: 12px; 
+  border-radius: 12px; 
+  color: #000; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
+}
+.card h3, .card p, .card div, .small, .inspector { color: #000 !important; text-shadow: none !important; }
+
+/* 按钮通用样式 */
+button {
+  border: 2px solid transparent; border-radius: 12px; padding: 8px 16px;
+  cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.15s ease;
+}
+button:hover:not(:disabled) { transform:translateY(-1px); }
+button:disabled { opacity:0.5; cursor:not-allowed; filter: grayscale(100%);}
+
+button.primary { background: var(--accent); color: #000; box-shadow: 0 2px 6px rgba(255, 200, 87, 0.4); }
+button.success { background: var(--accent2); color: #000; box-shadow: 0 2px 6px rgba(142, 226, 142, 0.4); }
+button.ghost { background: transparent; color: #000; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.1); }
+button.ghost:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.3); }
+button.danger { background: var(--danger); color: #000; }
+/* 离开建筑专用样式 */
+button.leave-btn { background: #fff !important; color: #000 !important; border: 2px solid #ffc857 !important; }
+
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.grid2 button{width:100%}
+
+.canvasBox{position:relative;min-width:0;min-height:0;background:transparent;overflow:hidden; display:flex; justify-content:center; align-items:center;}
+canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 25px rgba(0,0,0,0.6);}
+
+.toast{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:10px 16px;z-index:10;max-width:470px;font-size:14px; color:#fff;}
+.hidden{display:none!important}
+
+/* 物品陈列卡片样式 */
+.item { background: rgba(255,255,255,0.8); border: 1px solid #dcd5c6; border-radius: 12px; padding: 10px; margin: 8px 0; color: #000; display: flex; flex-direction: column; }
+.item.selected { outline: 2px solid var(--accent); background: rgba(255, 200, 87, 0.3); }
+.item-content { display: flex; align-items: flex-start; gap: 10px; width: 100%; }
+.item-img { width: 50px; height: 50px; object-fit: contain; flex-shrink: 0; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 2px;}
+.item-info { flex: 1; min-width: 0; }
+.item .head { display:flex; justify-content:space-between; gap:4px; align-items:center; color:#000; font-weight: bold; margin-bottom: 4px;}
+.item b{font-size:14px}.item p{font-size:12px;color:#333;margin:4px 0 8px;line-height:1.3;}
+.item-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; font-size: 11px; color: #555; margin-bottom: 5px; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px; }
+.badge{display:inline-block;border-radius:999px;padding:2px 7px;font-size:11px;border:1px solid rgba(0,0,0,0.2);white-space:nowrap; color:#000;}
+
+.tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+.tab{background: transparent; color: #000; border: 1px solid rgba(0,0,0,0.1); font-weight:normal;}
+.tab.active{background: var(--accent); color: #000; font-weight: 800; border: none;}
+.tabPane{display:none}.tabPane.active{display:block}.list{max-height:40vh;overflow:auto;padding-right:3px}
+.log{font-size:12px;color:#000;line-height:1.45;max-height:74vh;overflow:auto}.log div{padding:6px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+
+/* 模态弹窗优化（要求：缩小长宽，上下居中） */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px; backdrop-filter: blur(4px);}
+/* 普通弹窗尺寸变小 */
+.modalCard.smallModal { width: min(380px, 88vw); min-height: auto; max-height: min(250px, 60vh); padding: 20px 18px; text-align: center; }
+.modalCard{width:min(880px,96vw); height:min(600px, 85vh); overflow:hidden; background:#f5f3ee; border:2px solid #dcd5c6; border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.65); padding:24px; position:relative; color:#000; display:flex; flex-direction:column;}
+.modalCard h2{margin:0 0 10px; color:#000; text-shadow:none;}
+.modalCard p{color:#333; line-height:1.5;}
+.choiceGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:16px}
+/* 战利品弹窗特殊样式 */
+.rewardGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:20px; flex:1;}
+.rewardBtn { background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; cursor: pointer; text-align: center;}
+.rewardBtn:hover { transform: scale(1.05); }
+
+.progressWrap{height:14px;background:rgba(0,0,0,.1);border-radius:999px;overflow:hidden;margin:12px 0}.progressBar{height:100%;width:0;background:var(--accent)}
+.inspector{font-size:12px;color:#000;line-height:1.45}.inspector .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+#nearPrompt{position:absolute;left:50%;bottom:80px;transform:translateX(-50%);background:#ffc857; color:#000; border:2px solid #000; padding:10px 20px; border-radius:999px; z-index:8; font-weight:900; font-size:16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);}
+.speedGroup button{padding:6px 8px}.speedGroup button.active{background:var(--accent);color:#111}
+
+#mainBottomBtn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 30px; font-size: 16px; border-radius: 999px; z-index: 20; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+
+/* 左侧波次详情面板 */
+.wave-sidebar-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 6px; }
+.wave-sidebar-item img { width: 30px; height: 30px; object-fit: contain; }
+
+@media(max-width:1180px){body{overflow:auto}.main{grid-template-columns:1fr}.side,.right{border:0}.canvasBox{order:-1}.topbar{height:auto;align-items:flex-start;gap:10px}}
+</style>
+</head>
+<body>
+
+<div id="genderModal" class="modal" style="z-index: 100;">
+  <div class="modalCard" style="text-align:center; display:flex; flex-direction:column; justify-content:center; background: url('UIII/background.png') center/cover no-repeat #000;">
+    <h1 style="color:#ffc857; text-shadow: 2px 2px 4px #000; margin-bottom: 30px;">Welcome to 'Oops, 100 Stress'</h1>
+    <h2 style="color:#fff; margin-bottom: 20px; text-shadow: 1px 1px 3px #000;">Select Your Character</h2>
+    <div class="choiceGrid" style="display:flex; justify-content:center; flex-wrap:wrap; gap:20px;">
+      <div onclick="selectGender('F1')" style="cursor:pointer; text-align:center; padding:15px; background:rgba(0,0,0,0.6); border:2px solid #ffc857; border-radius:16px; width:160px;">
+        <img src="character/Female1.png" alt="Girl A" onerror="this.src=''; this.alt='👩';" style="width:100px; height:100px; object-fit:contain;"><br><br><button class="primary" style="width:100%;">Girl A</button>
+      </div>
+      <div onclick="selectGender('F2')" style="cursor:pointer; text-align:center; padding:15px; background:rgba(0,0,0,0.6); border:2px solid #ffc857; border-radius:16px; width:160px;">
+        <img src="character/Female2.png" alt="Girl B" onerror="this.src=''; this.alt='👧';" style="width:100px; height:100px; object-fit:contain;"><br><br><button class="primary" style="width:100%;">Girl B</button>
+      </div>
+      <div onclick="selectGender('M1')" style="cursor:pointer; text-align:center; padding:15px; background:rgba(0,0,0,0.6); border:2px solid #ffc857; border-radius:16px; width:160px;">
+        <img src="character/Male1.png" alt="Boy A" onerror="this.src=''; this.alt='👨';" style="width:100px; height:100px; object-fit:contain;"><br><br><button class="primary" style="width:100%;">Boy A</button>
+      </div>
+      <div onclick="selectGender('M2')" style="cursor:pointer; text-align:center; padding:15px; background:rgba(0,0,0,0.6); border:2px solid #ffc857; border-radius:16px; width:160px;">
+        <img src="character/Male2.png" alt="Boy B" onerror="this.src=''; this.alt='👦';" style="width:100px; height:100px; object-fit:contain;"><br><br><button class="primary" style="width:100%;">Boy B</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <header class="topbar">
+    <div class="center-hud">
+      <span class="pill" title="Current Day">🗓️ <b id="hudDay">Monday</b></span>
+      <span class="pill" title="Stress">🤯 <b id="hudStress">0</b>/100</span>
+      <span class="pill" title="Gold">🪙 <b id="hudGold">100</b></span>
+      <span class="pill" title="AP">🐾 <b id="hudAP">3</b></span>
+    </div>
+    <div class="right-hud">
+      <button id="audioBtn" class="icon-btn" title="Audio Toggle">🔊</button>
+      <button id="helpBtn" class="icon-btn" title="Help">❓</button>
+      <button id="restartBtn" class="icon-btn" title="Restart" style="color:var(--danger);">🔄</button>
+    </div>
+  </header>
+  
+  <main class="main">
+    <aside class="side">
+      <section id="dayPanel" class="card">
+        <h3 style="margin:0 0 8px; font-size:15px;">Daytime Action</h3>
+        <p class="small">Use WASD or Arrow Keys to move. Press Space near buildings.<br><b style="color:#d97706">Manage Stress! 100 Stress = Game Over!</b><br>Shop is closed during day.</p>
+      </section>
+      
+      <section id="deployPanel" class="card hidden">
+        <h3 style="margin:0 0 8px; font-size:15px;">Night Deploy / Combat</h3>
+        <div class="grid2">
+          <button id="startBattleBtn" class="primary">Start Wave</button>
+          <button id="cancelBtn" class="ghost">Cancel Selection</button>
+        </div>
+        <hr style="border-color:rgba(0,0,0,0.1); margin:12px 0">
+        <div class="grid2">
+          <button id="buyBuffSlot" class="ghost">+ Buff Slot (50)</button>
+          <button id="buyTacSlot" class="ghost">+ Tactic Slot (50)</button>
+        </div>
+        
+        <h3 style="margin:16px 0 8px; font-size:14px; color:#d97706 !important;">Incoming Enemies</h3>
+        <div id="waveInfoLeft" class="small"></div>
+        
+        <div id="battleControls" class="hidden">
+            <hr style="border-color:rgba(0,0,0,0.1); margin:12px 0">
+            <div id="battleInfo" style="background:#ffeaa7; padding:8px; border-radius:8px; font-size:12px; margin-bottom:8px;"></div>
+            <div class="row speedGroup" style="margin-bottom:8px;">
+            <span class="small">Speed:</span>
+            <button data-speed="1" class="active">1x</button>
+            <button data-speed="2">2x</button>
+            <button data-speed="3">3x</button>
+            </div>
+            <h3 style="margin-top:12px; font-size:14px;">Tactics</h3>
+            <div id="battleTactics" class="grid2"></div>
+        </div>
+      </section>
+    </aside>
+    
+    <section class="canvasBox">
+      <canvas id="game"></canvas>
+      <div id="toast" class="toast hidden"></div>
+      <div id="nearPrompt" class="hidden"></div>
+      <button id="mainBottomBtn" class="primary">Enter Night</button>
+    </section>
+    
+    <aside class="side right">
+      <div class="tabs">
+        <button class="tab active" data-tab="inventory">Inventory & Shop</button>
+        <button class="tab" data-tab="log">Combat Log</button>
+      </div>
+      
+      <section id="pane-inventory" class="tabPane active">
+        <div class="card">
+          <h3 style="margin:0 0 10px; font-size:14px;">Inventory: Towers</h3>
+          <div id="towerInv" class="list"></div>
+        </div>
+
+        <div id="nightShopSection" class="card hidden" style="border:2px solid var(--accent); background:rgba(255,200,87,0.15);">
+          <h3 style="margin:0 0 10px; font-size:15px; color:#d97706 !important;">Night Tower Shop</h3>
+          <div id="nightShopGrid" class="list" style="max-height: 25vh;"></div>
+        </div>
+      
+        <div class="card">
+          <h3 style="margin:0 0 10px; font-size:14px;">Placed Tower Details</h3>
+          <div id="towerInspector" class="inspector">Click a tower on the map to inspect.</div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 10px; font-size:14px;">Inventory: Buffs & Tactics</h3>
+          <div id="buffInv" class="list"></div>
+          <div id="tacticInv" class="list"></div>
+        </div>
+      </section>
+      
+      <section id="pane-log" class="tabPane">
+        <div class="card">
+          <div id="logList" class="log"></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+</div>
+<div id="modal" class="modal hidden"><div id="modalBody" class="modalCard"></div></div>
+
+<script>
+// ========== 图像缓存机制 ==========
+const imgCache = {};
+function getImg(src) {
+    if(!src) return {complete:false};
+    if(imgCache[src]) return imgCache[src];
+    const img = new Image();
+    img.src = src;
+    imgCache[src] = img;
+    return img;
+}
+
+// 获取受击发红的离屏缓存图，保证轮廓一致不影响性能
+function getHitTintImg(img) {
+    if(!img.complete || img.width===0) return img;
+    if(img.hitTintCanvas) return img.hitTintCanvas;
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    ctx.globalCompositeOperation = 'source-in'; // 关键：只在有像素的地方填充颜色
+    ctx.fillStyle = 'red';
+    ctx.fillRect(0, 0, c.width, c.height);
+    img.hitTintCanvas = c;
+    return c;
+}
+
+const ASSETS = {
+  day: "assets/map_day.png",
+  night: "assets/map_night.png",
+  buffModal: "assets/buff.png",
+  shopModal: "assets/shoppage.png"
+};
+
+const INDOOR_BGS = {
+  'office': 'assets/indoor-office.png',
+  'library': 'assets/indoor-library.png',
+  'restaurant': 'assets/indoor-restaurant.png',
+  'dorm': 'assets/indoor-dorm.png'
+};
+
+// 翻译所有塔名及匹配正确路径
+const TOWER_IMGS = {
+  'focus_note': '怪&塔/基础塔/专注便签塔.png',
+  'tomato_clock': '怪&塔/稀有塔/番茄钟塔.png',
+  'flow_prism': '怪&塔/罕见塔/心流棱镜塔.png',
+  'plan_cannon': '怪&塔/基础塔/计划炮塔.png',
+  'milestone_cannon': '怪&塔/稀有塔/里程碑炮塔.png',
+  'matrix_breaker': '怪&塔/罕见塔/拆解矩阵器.png',
+  'checklist_mortar': '怪&塔/基础塔/清单迫击炮.png',
+  'multithread_list': '怪&塔/稀有塔/多线程清单塔.png',
+  'archive_storm': '怪&塔/罕见塔/归档风暴塔.png',
+  'calm_spray': '怪&塔/基础塔/冷静喷雾塔.png',
+  'breath_beat': '怪&塔/稀有塔/呼吸节拍塔.png',
+  'time_anchor': '怪&塔/罕见塔/时间锚定塔.png',
+  'arc_link': '怪&塔/基础塔/连接电弧塔.png',
+  'support_hotline': '怪&塔/稀有塔/支援热线塔.png',
+  'resonance_net': '怪&塔/罕见塔/共振网络塔.png',
+  'boundary_sentry': '怪&塔/基础塔/边界哨塔.png',
+  'reject_threshold': '怪&塔/稀有塔/拒绝门槛塔.png',
+  'safe_boundary': '怪&塔/罕见塔/安全边界塔.png',
+  'review_mark': '怪&塔/基础塔/复盘标记塔.png',
+  'mistake_book': '怪&塔/稀有塔/错题本塔.png',
+  'insight_reader': '怪&塔/罕见塔/洞察判读仪器.png',
+  'rest_lighthouse': '怪&塔/基础塔/休息灯塔.png',
+  'sleep_pod': '怪&塔/稀有塔/睡眠舱塔.png',
+  'safe_house': '怪&塔/罕见塔/安心据点塔.png'
+};
+
+const ENEMY_IMGS = {
+  'thought': '怪&塔/怪/杂念.png',
+  'urgency': '怪&塔/怪/急迫感.png',
+  'shell': '怪&塔/怪/压力壳.png',
+  'repeat': '怪&塔/怪/反复念头.png',
+  'smallThought': '怪&塔/怪/小杂念.png',
+  'rational': '怪&塔/怪/合理化.png',
+  'noise': '怪&塔/怪/噪音.png',
+  'avoid': '怪&塔/怪/逃避.png',
+  'numb': '怪&塔/怪/疲惫.png',
+  'deadline': '怪&塔/怪/deadline.png'
+};
+
+const TACTIC_IMGS = {
+  'tb1': '道具/速溶咖啡.png',
+  'tb2': '道具/应急零食.png',
+  'tr1': '道具/降噪耳机.png',
+  'tr4': '道具/情绪稳定剂.png',
+  'tl1': '道具/全局暂停.png',
+  'clear_tasks': '道具/清空待办.png',
+  'backup_power': '道具/备用电源.png',
+  'route_reconstruct': '道具/路线重构.png',
+  'sticky_block': '道具/便利贴路障.png',
+  'anchor': '道具/稳定锚点.png',
+  'cold_water': '道具/冷水洗脸.png',
+  'emergency_plan': '道具/紧急计划表.png'
+};
+
+const SHOP_ITEM_PATHS = {
+  backup_power: '道具/备用电源.png',
+  sticky_block: '道具/便利贴路障.png',
+  tr1: '道具/降噪耳机.png',
+  emergency_plan: '道具/紧急计划表.png',
+  cold_water: '道具/冷水洗脸.png',
+  route_reconstruct: '道具/路线重构.png',
+  clear_tasks: '道具/清空待办.png',
+  tr4: '道具/情绪稳定剂.png',
+  tl1: '道具/全局暂停.png',
+  tb1: '道具/速溶咖啡.png',
+  anchor: '道具/稳定锚点.png',
+  tb2: '道具/应急零食.png'
+};
+
+let playerSrc = 'character/Female1.png';
+function selectGender(g) {
+    if(g === 'F1') playerSrc = 'character/Female1.png';
+    else if(g === 'F2') playerSrc = 'character/Female2.png';
+    else if(g === 'M1') playerSrc = 'character/Male1.png';
+    else if(g === 'M2') playerSrc = 'character/Male2.png';
+    getImg(playerSrc);
+    document.getElementById('genderModal').classList.add('hidden');
+    unlockAudio();
+}
+
+// ========== 地图逻辑：完全保留原有地图并恢复BFS寻路支持多路径 ==========
+const MAP = {
+  "cols": 21, "rows": 15, "cellSize": 64,
+  "cells": [
+    {"r": 0,"c": 0,"type": "背景"},{"r": 0,"c": 1,"type": "背景"},{"r": 0,"c": 2,"type": "背景"},{"r": 0,"c": 3,"type": "tower"},{"r": 0,"c": 4,"type": "start"},{"r": 0,"c": 5,"type": "背景"},{"r": 0,"c": 6,"type": "背景"},{"r": 0,"c": 7,"type": "背景"},{"r": 0,"c": 8,"type": "背景"},{"r": 0,"c": 9,"type": "背景"},{"r": 0,"c": 10,"type": "背景"},{"r": 0,"c": 11,"type": "背景"},{"r": 0,"c": 12,"type": "背景"},{"r": 0,"c": 13,"type": "背景"},{"r": 0,"c": 14,"type": "背景"},{"r": 0,"c": 15,"type": "背景"},{"r": 0,"c": 16,"type": "背景"},{"r": 0,"c": 17,"type": "背景"},{"r": 0,"c": 18,"type": "背景"},{"r": 0,"c": 19,"type": "背景"},{"r": 0,"c": 20,"type": "背景"},
+    {"r": 1,"c": 0,"type": "背景"},{"r": 1,"c": 1,"type": "背景"},{"r": 1,"c": 2,"type": "背景"},{"r": 1,"c": 3,"type": "tower"},{"r": 1,"c": 4,"type": "road"},{"r": 1,"c": 5,"type": "放松区"},{"r": 1,"c": 6,"type": "放松区"},{"r": 1,"c": 7,"type": "放松区"},{"r": 1,"c": 8,"type": "背景"},{"r": 1,"c": 9,"type": "背景"},{"r": 1,"c": 10,"type": "背景"},{"r": 1,"c": 11,"type": "背景"},{"r": 1,"c": 12,"type": "背景"},{"r": 1,"c": 13,"type": "背景"},{"r": 1,"c": 14,"type": "背景"},{"r": 1,"c": 15,"type": "背景"},{"r": 1,"c": 16,"type": "背景"},{"r": 1,"c": 17,"type": "背景"},{"r": 1,"c": 18,"type": "背景"},{"r": 1,"c": 19,"type": "背景"},{"r": 1,"c": 20,"type": "背景"},
+    {"r": 2,"c": 0,"type": "背景"},{"r": 2,"c": 1,"type": "背景"},{"r": 2,"c": 2,"type": "背景"},{"r": 2,"c": 3,"type": "tower"},{"r": 2,"c": 4,"type": "road"},{"r": 2,"c": 5,"type": "放松区"},{"r": 2,"c": 6,"type": "放松区"},{"r": 2,"c": 7,"type": "放松区"},{"r": 2,"c": 8,"type": "tower"},{"r": 2,"c": 9,"type": "背景"},{"r": 2,"c": 10,"type": "背景"},{"r": 2,"c": 11,"type": "背景"},{"r": 2,"c": 12,"type": "背景"},{"r": 2,"c": 13,"type": "背景"},{"r": 2,"c": 14,"type": "背景"},{"r": 2,"c": 15,"type": "背景"},{"r": 2,"c": 16,"type": "背景"},{"r": 2,"c": 17,"type": "背景"},{"r": 2,"c": 18,"type": "背景"},{"r": 2,"c": 19,"type": "背景"},{"r": 2,"c": 20,"type": "背景"},
+    {"r": 3,"c": 0,"type": "背景"},{"r": 3,"c": 1,"type": "背景"},{"r": 3,"c": 2,"type": "tower"},{"r": 3,"c": 3,"type": "tower"},{"r": 3,"c": 4,"type": "road"},{"r": 3,"c": 5,"type": "tower"},{"r": 3,"c": 6,"type": "tower"},{"r": 3,"c": 7,"type": "tower"},{"r": 3,"c": 8,"type": "tower"},{"r": 3,"c": 9,"type": "tower"},{"r": 3,"c": 10,"type": "tower"},{"r": 3,"c": 11,"type": "tower"},{"r": 3,"c": 12,"type": "tower"},{"r": 3,"c": 13,"type": "tower"},{"r": 3,"c": 14,"type": "背景"},{"r": 3,"c": 15,"type": "背景"},{"r": 3,"c": 16,"type": "背景"},{"r": 3,"c": 17,"type": "背景"},{"r": 3,"c": 18,"type": "背景"},{"r": 3,"c": 19,"type": "背景"},{"r": 3,"c": 20,"type": "背景"},
+    {"r": 4,"c": 0,"type": "背景"},{"r": 4,"c": 1,"type": "背景"},{"r": 4,"c": 2,"type": "tower"},{"r": 4,"c": 3,"type": "road"},{"r": 4,"c": 4,"type": "road"},{"r": 4,"c": 5,"type": "road"},{"r": 4,"c": 6,"type": "road"},{"r": 4,"c": 7,"type": "road"},{"r": 4,"c": 8,"type": "road"},{"r": 4,"c": 9,"type": "road"},{"r": 4,"c": 10,"type": "road"},{"r": 4,"c": 11,"type": "road"},{"r": 4,"c": 12,"type": "road"},{"r": 4,"c": 13,"type": "road"},{"r": 4,"c": 14,"type": "tower"},{"r": 4,"c": 15,"type": "tower"},{"r": 4,"c": 16,"type": "road"},{"r": 4,"c": 17,"type": "road"},{"r": 4,"c": 18,"type": "road"},{"r": 4,"c": 19,"type": "road"},{"r": 4,"c": 20,"type": "road"},
+    {"r": 5,"c": 0,"type": "背景"},{"r": 5,"c": 1,"type": "背景"},{"r": 5,"c": 2,"type": "tower"},{"r": 5,"c": 3,"type": "road"},{"r": 5,"c": 4,"type": "背景"},{"r": 5,"c": 5,"type": "工作区"},{"r": 5,"c": 6,"type": "工作区"},{"r": 5,"c": 7,"type": "工作区"},{"r": 5,"c": 8,"type": "背景"},{"r": 5,"c": 9,"type": "tower"},{"r": 5,"c": 10,"type": "tower"},{"r": 5,"c": 11,"type": "tower"},{"r": 5,"c": 12,"type": "tower"},{"r": 5,"c": 13,"type": "road"},{"r": 5,"c": 14,"type": "tower"},{"r": 5,"c": 15,"type": "tower"},{"r": 5,"c": 16,"type": "road"},{"r": 5,"c": 17,"type": "tower"},{"r": 5,"c": 18,"type": "tower"},{"r": 5,"c": 19,"type": "背景"},{"r": 5,"c": 20,"type": "背景"},
+    {"r": 6,"c": 0,"type": "背景"},{"r": 6,"c": 1,"type": "背景"},{"r": 6,"c": 2,"type": "tower"},{"r": 6,"c": 3,"type": "road"},{"r": 6,"c": 4,"type": "背景"},{"r": 6,"c": 5,"type": "工作区"},{"r": 6,"c": 6,"type": "工作区"},{"r": 6,"c": 7,"type": "工作区"},{"r": 6,"c": 8,"type": "背景"},{"r": 6,"c": 9,"type": "tower"},{"r": 6,"c": 10,"type": "tower"},{"r": 6,"c": 11,"type": "tower"},{"r": 6,"c": 12,"type": "tower"},{"r": 6,"c": 13,"type": "road"},{"r": 6,"c": 14,"type": "road"},{"r": 6,"c": 15,"type": "road"},{"r": 6,"c": 16,"type": "road"},{"r": 6,"c": 17,"type": "tower"},{"r": 6,"c": 18,"type": "tower"},{"r": 6,"c": 19,"type": "背景"},{"r": 6,"c": 20,"type": "背景"},
+    {"r": 7,"c": 0,"type": "背景"},{"r": 7,"c": 1,"type": "背景"},{"r": 7,"c": 2,"type": "tower"},{"r": 7,"c": 3,"type": "road"},{"r": 7,"c": 4,"type": "road"},{"r": 7,"c": 5,"type": "工作区"},{"r": 7,"c": 6,"type": "工作区"},{"r": 7,"c": 7,"type": "工作区"},{"r": 7,"c": 8,"type": "背景"},{"r": 7,"c": 9,"type": "road"},{"r": 7,"c": 10,"type": "road"},{"r": 7,"c": 11,"type": "road"},{"r": 7,"c": 12,"type": "road"},{"r": 7,"c": 13,"type": "road"},{"r": 7,"c": 14,"type": "tower"},{"r": 7,"c": 15,"type": "tower"},{"r": 7,"c": 16,"type": "road"},{"r": 7,"c": 17,"type": "tower"},{"r": 7,"c": 18,"type": "背景"},{"r": 7,"c": 19,"type": "背景"},{"r": 7,"c": 20,"type": "背景"},
+    {"r": 8,"c": 0,"type": "背景"},{"r": 8,"c": 1,"type": "背景"},{"r": 8,"c": 2,"type": "tower"},{"r": 8,"c": 3,"type": "tower"},{"r": 8,"c": 4,"type": "road"},{"r": 8,"c": 5,"type": "tower"},{"r": 8,"c": 6,"type": "tower"},{"r": 8,"c": 7,"type": "tower"},{"r": 8,"c": 8,"type": "road"},{"r": 8,"c": 9,"type": "road"},{"r": 8,"c": 10,"type": "锻炼区"},{"r": 8,"c": 11,"type": "锻炼区"},{"r": 8,"c": 12,"type": "锻炼区"},{"r": 8,"c": 13,"type": "锻炼区"},{"r": 8,"c": 14,"type": "tower"},{"r": 8,"c": 15,"type": "tower"},{"r": 8,"c": 16,"type": "road"},{"r": 8,"c": 17,"type": "tower"},{"r": 8,"c": 18,"type": "背景"},{"r": 8,"c": 19,"type": "背景"},{"r": 8,"c": 20,"type": "背景"},
+    {"r": 9,"c": 0,"type": "背景"},{"r": 9,"c": 1,"type": "背景"},{"r": 9,"c": 2,"type": "tower"},{"r": 9,"c": 3,"type": "tower"},{"r": 9,"c": 4,"type": "road"},{"r": 9,"c": 5,"type": "road"},{"r": 9,"c": 6,"type": "road"},{"r": 9,"c": 7,"type": "road"},{"r": 9,"c": 8,"type": "road"},{"r": 9,"c": 9,"type": "锻炼区"},{"r": 9,"c": 10,"type": "锻炼区"},{"r": 9,"c": 11,"type": "锻炼区"},{"r": 9,"c": 12,"type": "锻炼区"},{"r": 9,"c": 13,"type": "锻炼区"},{"r": 9,"c": 14,"type": "tower"},{"r": 9,"c": 15,"type": "tower"},{"r": 9,"c": 16,"type": "road"},{"r": 9,"c": 17,"type": "tower"},{"r": 9,"c": 18,"type": "背景"},{"r": 9,"c": 19,"type": "背景"},{"r": 9,"c": 20,"type": "背景"},
+    {"r": 10,"c": 0,"type": "背景"},{"r": 10,"c": 1,"type": "背景"},{"r": 10,"c": 2,"type": "背景"},{"r": 10,"c": 3,"type": "商店"},{"r": 10,"c": 4,"type": "商店"},{"r": 10,"c": 5,"type": "road"},{"r": 10,"c": 6,"type": "tower"},{"r": 10,"c": 7,"type": "tower"},{"r": 10,"c": 8,"type": "tower"},{"r": 10,"c": 9,"type": "tower"},{"r": 10,"c": 10,"type": "tower"},{"r": 10,"c": 11,"type": "tower"},{"r": 10,"c": 12,"type": "tower"},{"r": 10,"c": 13,"type": "tower"},{"r": 10,"c": 14,"type": "road"},{"r": 10,"c": 15,"type": "road"},{"r": 10,"c": 16,"type": "road"},{"r": 10,"c": 17,"type": "锻炼区_1"},{"r": 10,"c": 18,"type": "背景"},{"r": 10,"c": 19,"type": "背景"},{"r": 10,"c": 20,"type": "背景"},
+    {"r": 11,"c": 0,"type": "背景"},{"r": 11,"c": 1,"type": "背景"},{"r": 11,"c": 2,"type": "背景"},{"r": 11,"c": 3,"type": "商店"},{"r": 11,"c": 4,"type": "商店"},{"r": 11,"c": 5,"type": "road"},{"r": 11,"c": 6,"type": "tower"},{"r": 11,"c": 7,"type": "tower"},{"r": 11,"c": 8,"type": "tower"},{"r": 11,"c": 9,"type": "tower"},{"r": 11,"c": 10,"type": "tower"},{"r": 11,"c": 11,"type": "tower"},{"r": 11,"c": 12,"type": "tower"},{"r": 11,"c": 13,"type": "tower"},{"r": 11,"c": 14,"type": "road"},{"r": 11,"c": 15,"type": "锻炼区_1"},{"r": 11,"c": 16,"type": "锻炼区_1"},{"r": 11,"c": 17,"type": "锻炼区_1"},{"r": 11,"c": 18,"type": "背景"},{"r": 11,"c": 19,"type": "背景"},{"r": 11,"c": 20,"type": "背景"},
+    {"r": 12,"c": 0,"type": "背景"},{"r": 12,"c": 1,"type": "背景"},{"r": 12,"c": 2,"type": "背景"},{"r": 12,"c": 3,"type": "商店"},{"r": 12,"c": 4,"type": "商店"},{"r": 12,"c": 5,"type": "road"},{"r": 12,"c": 6,"type": "road"},{"r": 12,"c": 7,"type": "road"},{"r": 12,"c": 8,"type": "road"},{"r": 12,"c": 9,"type": "road"},{"r": 12,"c": 10,"type": "tower"},{"r": 12,"c": 11,"type": "tower"},{"r": 12,"c": 12,"type": "tower"},{"r": 12,"c": 13,"type": "tower"},{"r": 12,"c": 14,"type": "road"},{"r": 12,"c": 15,"type": "锻炼区_1"},{"r": 12,"c": 16,"type": "锻炼区_1"},{"r": 12,"c": 17,"type": "锻炼区_1"},{"r": 12,"c": 18,"type": "背景"},{"r": 12,"c": 19,"type": "背景"},{"r": 12,"c": 20,"type": "背景"},
+    {"r": 13,"c": 0,"type": "背景"},{"r": 13,"c": 1,"type": "背景"},{"r": 13,"c": 2,"type": "背景"},{"r": 13,"c": 3,"type": "背景"},{"r": 13,"c": 4,"type": "背景"},{"r": 13,"c": 5,"type": "tower"},{"r": 13,"c": 6,"type": "tower"},{"r": 13,"c": 7,"type": "tower"},{"r": 13,"c": 8,"type": "tower"},{"r": 13,"c": 9,"type": "road"},{"r": 13,"c": 10,"type": "road"},{"r": 13,"c": 11,"type": "road"},{"r": 13,"c": 12,"type": "road"},{"r": 13,"c": 13,"type": "road"},{"r": 13,"c": 14,"type": "road"},{"r": 13,"c": 15,"type": "背景"},{"r": 13,"c": 16,"type": "背景"},{"r": 13,"c": 17,"type": "背景"},{"r": 13,"c": 18,"type": "背景"},{"r": 13,"c": 19,"type": "背景"},{"r": 13,"c": 20,"type": "背景"},
+    {"r": 14,"c": 0,"type": "背景"},{"r": 14,"c": 1,"type": "背景"},{"r": 14,"c": 2,"type": "背景"},{"r": 14,"c": 3,"type": "背景"},{"r": 14,"c": 4,"type": "背景"},{"r": 14,"c": 5,"type": "背景"},{"r": 14,"c": 6,"type": "背景"},{"r": 14,"c": 7,"type": "背景"},{"r": 14,"c": 8,"type": "背景"},{"r": 14,"c": 9,"type": "背景"},{"r": 14,"c": 10,"type": "背景"},{"r": 14,"c": 11,"type": "背景"},{"r": 14,"c": 12,"type": "tower"},{"r": 14,"c": 13,"type": "tower"},{"r": 14,"c": 14,"type": "core"},{"r": 14,"c": 15,"type": "背景"},{"r": 14,"c": 16,"type": "背景"},{"r": 14,"c": 17,"type": "背景"},{"r": 14,"c": 18,"type": "背景"},{"r": 14,"c": 19,"type": "背景"},{"r": 14,"c": 20,"type": "背景"}
+  ]
+};
+
+const C = MAP.cellSize, COLS = MAP.cols, ROWS = MAP.rows, W = COLS*C, H = ROWS*C;
+const canvas = document.getElementById('game'); const ctx = canvas.getContext('2d');
+canvas.width = W; canvas.height = H;
+
+const RARITY_CLASS = {basic:'basic', rare:'rare', legendary:'legendary'};
+const RARITY = {basic:'Basic', rare:'Rare', legendary:'Legendary'};
+const BUILDING_NAMES = {office:'Office', library:'Library', restaurant:'Restaurant', shop:'Shop', dorm:'Dorm'};
+const CELL_TO_BUILDING = {'工作区':'office','锻炼区':'library','放松区':'restaurant','商店':'shop','锻炼区_1':'dorm'};
+
+const cellMap = Array.from({length:ROWS},()=>Array(COLS).fill('empty'));
+for(const cell of MAP.cells){ if(cell.r>=0 && cell.r<ROWS && cell.c>=0 && cell.c<COLS) cellMap[cell.r][cell.c]=cell.type||'背景'; }
+const cellsByType = {};
+for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const t=cellMap[r][c]; (cellsByType[t] ||= []).push({r,c}); }
+
+function centerOf(r,c){ return {x:(c+.5)*C, y:(r+.5)*C};}
+function gridOf(x,y){ return {r:Math.floor(y/C), c:Math.floor(x/C)};}
+function inBounds(r,c){ return r>=0&&r<ROWS&&c>=0&&c<COLS;}
+function cellKey(r,c){return r+','+c;}
+function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y);}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)];}
+// BFS寻路的打乱方向，这样如果有多条最短路径，会产生随机选择
+function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+
+const walkableTypes = new Set(['road','start','core']);
+const pathTypes = new Set(['road','start','core']);
+const towerCells = cellsByType.tower || [];
+const startCells = cellsByType.start || [];
+
+function isPathCell(r,c){
+  if(!inBounds(r,c)) return false;
+  return pathTypes.has(cellMap[r][c]);
+}
+function neighbors(r,c){
+  let dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+  dirs = shuffle(dirs);
+  const res=[];
+  for(const [dr,dc] of dirs) if(isPathCell(r+dr, c+dc)) res.push({r:r+dr, c:c+dc});
+  return res;
+}
+function findPath(start){
+  const visited = new Set();
+  const cells = [start];
+  function dfs(cur){
+    const curKey = cellKey(cur.r, cur.c);
+    visited.add(curKey);
+    if(cellMap[cur.r][cur.c] === 'core') return true;
+    let options = neighbors(cur.r, cur.c).filter(nb => !visited.has(cellKey(nb.r, nb.c)));
+    if(Math.random() < 0.5) options.sort((a,b)=>(b.c-a.c) || (a.r-b.r));
+    for(const nb of options){
+      cells.push(nb);
+      if(dfs(nb)) return true;
+      cells.pop();
+    }
+    visited.delete(curKey);
+    return false;
+  }
+  if(!dfs(start)) return null;
+  return cells.map(cell => centerOf(cell.r, cell.c));
+}
+function pickStartCell(){
+  const valid = startCells.filter(s=>findPath(s));
+  return valid.length ? valid[Math.floor(Math.random()*valid.length)] : startCells[0];
+}
+
+// ========== V4 7天波次机制与压力 ==========
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const STRESS_LEVELS = [
+  { max: 24, name: "Relaxed", color: "#8ee28e" },
+  { max: 49, name: "Stable", color: "#ffc857" },
+  { max: 74, name: "Efficient", color: "#ff9f43" },
+  { max: 89, name: "High Risk", color: "#ff6b6b" },
+  { max: 99, name: "Edge of Breakdown", color: "#ee5253" }
+];
+
+function getStressPhase(stress) {
+  for(const l of STRESS_LEVELS) if(stress <= l.max) return l;
+  return { name: "Breakdown", color: "#000" };
+}
+
+function calcWaveMultipliers(effectiveStress) {
+  if(effectiveStress <= 20) return { hp: 0.85, spd: 0.95, leak: 0.8, gold: 0.75 };
+  if(effectiveStress <= 35) return { hp: 1.0, spd: 1.0, leak: 1.0, gold: 1.0 };
+  if(effectiveStress <= 50) return { hp: 1.2, spd: 1.2, leak: 1.1, gold: 1.25 };
+  if(effectiveStress <= 70) return { hp: 1.4, spd: 1.3, leak: 1.25, gold: 1.4 };
+  if(effectiveStress <= 90) return { hp: 1.6, spd: 1.5, leak: 1.25, gold: 1.8 };
+  return { hp: 2.0, spd: 1.8, leak: 1.5, gold: 2.0 };
+}
+
+// REMOVED: Duplicate addStress function - using the version that calls triggerHighStressWarning() at line 1246 instead
+
+// ========== V4 塔防与物品数据（英文） ==========
+const TOWERS = [
+ {id:'focus_note',name:'Focus Note Tower',rarity:'basic',price:35,stress:12,atk:7,rate:2.0,range:3.0,aoe:0,desc:'Stable & fast single target attack.',up:[[20,'ATK +2'],[35,'SPD +15%'],[50,'Bonus DMG on 4th hit']]},
+ {id:'tomato_clock',name:'Tomato Clock Tower',rarity:'rare',price:75,stress:22,atk:9,rate:2.0,range:3.2,aoe:0,desc:'Dash status after 10s attacking.',up:[[40,'ATK +3'],[65,'Dash lasts 5s'],[90,'Prioritize fast enemies']]},
+ {id:'flow_prism',name:'Flow Prism Tower',rarity:'legendary',price:125,stress:35,atk:10,rate:2.1,range:3.4,aoe:0,desc:'DMG scales on same target.',up:[[65,'Max 6 stacks'],[100,'Range +0.4'],[140,'Transfers half stack on kill']]},
+ {id:'plan_cannon',name:'Plan Cannon',rarity:'basic',price:50,stress:12,atk:26,rate:.65,range:4.4,aoe:0,desc:'Ignores 8 armor.',up:[[25,'ATK +7'],[45,'Ignore 12 armor'],[65,'+20% DMG vs Heavy']]},
+ {id:'milestone_cannon',name:'Milestone Cannon',rarity:'rare',price:85,stress:22,atk:32,rate:.62,range:4.6,aoe:0,desc:'Marks enemy with vulnerability.',up:[[45,'ATK +7'],[75,'Mark time +2s'],[105,'Gold on marked kill']]},
+ {id:'checklist_mortar',name:'Checklist Mortar',rarity:'basic',price:50,stress:12,atk:20,rate:.70,range:4.2,aoe:1.0,desc:'Standard AoE explosion.',up:[[25,'ATK +5'],[45,'AoE +0.2'],[65,'Burn effect']]},
+ {id:'calm_spray',name:'Calm Spray Tower',rarity:'basic',price:40,stress:12,atk:4,rate:1.2,range:3.4,aoe:0,desc:'Slows enemy by 25%.',up:[[20,'Slow to 32%'],[35,'Duration +0.4s'],[55,'Vuln. on slow']]},
+ {id:'breath_beat',name:'Breath Beat Tower',rarity:'rare',price:80,stress:22,atk:3,rate:1.0,range:3.5,aoe:1.0,desc:'AoE slowing pulse.',up:[[40,'AoE +0.2'],[65,'Slow to 38%'],[90,'Stun every 3rd pulse']]},
+ {id:'arc_link',name:'Arc Link Tower',rarity:'basic',price:55,stress:12,atk:11,rate:1.0,range:3.2,aoe:0,desc:'Attacks chain to nearby enemies.',up:[[30,'ATK +3'],[50,'Chain +1 target'],[70,'Stun on 5th hit']]},
+ {id:'rest_lighthouse',name:'Rest Lighthouse',rarity:'basic',price:35,stress:12,atk:2,rate:.8,range:2.8,aoe:0.8,desc:'Stress -3 after wave ends.',special:'recover3',up:[[20,'Extra -1 Stress'],[35,'AoE +0.2'],[50,'-2 Stress if flawless']]}
+];
+const towerById = Object.fromEntries(TOWERS.map(t=>[t.id,t]));
+
+const BUFFS=[
+ {id:'ob1',name:'Deep Breath',kind:'One-time',rarity:'basic',price:30,stress:7,desc:'Stress -5 at start of wave.', apply:()=>{addStress(-5);log('Deep Breath: Stress -5');}},
+ {id:'ob2',name:'Temp Supply',kind:'One-time',rarity:'basic',price:30,stress:7,desc:'Gold +40 at start of wave.', apply:()=>{state.gold+=40;log('Temp Supply: Gold +40');}},
+ {id:'ol5',name:'Last Breath',kind:'One-time',rarity:'legendary',price:90,stress:22,desc:'Locks stress at 99 once.', mods:{lastBreath:true}},
+ {id:'pb1',name:'Full Meal',kind:'Passive',rarity:'basic',price:45,stress:10,desc:'All towers SPD +5%', mods:{towerRate:1.05}},
+ {id:'pb2',name:'Focus Moment',kind:'Passive',rarity:'basic',price:45,stress:10,desc:'All towers DMG +6%', mods:{towerDamage:1.06}},
+ {id:'pl1',name:'Flow State',kind:'Passive',rarity:'legendary',price:130,stress:30,desc:'DMG +15%, SPD +10%', mods:{towerDamage:1.15,towerRate:1.10}}
+];
+const buffById=Object.fromEntries(BUFFS.map(b=>[b.id,b]));
+
+const TACTICS=[
+ {id:'tb1',name:'Instant Coffee',rarity:'basic',price:50,stress:11,consume:false,desc:'SPD +20% for 8s, Stress +5'},
+ {id:'tb2',name:'Emergency Snack',rarity:'basic',price:50,stress:11,consume:true,desc:'Instant: Stress -6 (Consumed)'},
+ {id:'tr1',name:'Noise Canceling',rarity:'rare',price:90,stress:20,consume:false,desc:'All enemies -35% SPD for 6s'},
+ {id:'tr4',name:'Mood Stabilizer',rarity:'rare',price:90,stress:20,consume:true,desc:'Instant: Stress -12 (Consumed)'},
+ {id:'tl1',name:'Global Pause',rarity:'legendary',price:150,stress:33,consume:false,desc:'Stop enemies for 4s (Boss 2s)'}
+];
+const tacticById=Object.fromEntries(TACTICS.map(t=>[t.id,t]));
+
+const EXTRA_BUFFS = [
+ {id:'backup_power',name:'Backup Power',kind:'Passive',rarity:'basic',price:55,stress:8,power:16,desc:'All towers gain +8% damage this night.',mods:{towerDamage:1.08}},
+ {id:'emergency_plan',name:'Emergency Plan',kind:'Passive',rarity:'basic',price:60,stress:9,power:18,desc:'All towers gain +10% fire rate this night.',mods:{towerRate:1.10}},
+ {id:'cold_water',name:'Cold Water Splash',kind:'One-time',rarity:'basic',price:40,stress:6,power:12,desc:'Reduce stress by 8 when the wave starts.',apply:()=>{addStress(-8);log('Cold Water Splash: Stress -8');}},
+ {id:'anchor',name:'Stable Anchor',kind:'Passive',rarity:'rare',price:95,stress:16,power:24,desc:'Locks stress at 99 once this night.',mods:{lastBreath:true}}
+];
+const EXTRA_TACTICS = [
+ {id:'sticky_block',name:'Sticky Note Barricade',rarity:'basic',price:55,stress:8,power:14,consume:true,desc:'All enemies are slowed by 45% for 5s.'},
+ {id:'route_reconstruct',name:'Route Reconstruct',rarity:'rare',price:85,stress:14,power:22,consume:true,desc:'Enemies reroute and lose 25% progress.'},
+ {id:'clear_tasks',name:'Clear Tasks',rarity:'rare',price:80,stress:12,power:20,consume:true,desc:'Deal 35 damage to all enemies on screen.'}
+];
+for(const buff of EXTRA_BUFFS){
+  BUFFS.push(buff);
+  buffById[buff.id] = buff;
+}
+for(const tactic of EXTRA_TACTICS){
+  TACTICS.push(tactic);
+  tacticById[tactic.id] = tactic;
+}
+
+const NIGHT_SHOP_CATALOG = [
+  {kind:'buff', id:'backup_power'},
+  {kind:'tactic', id:'sticky_block'},
+  {kind:'tactic', id:'tr1'},
+  {kind:'buff', id:'emergency_plan'},
+  {kind:'buff', id:'cold_water'},
+  {kind:'tactic', id:'route_reconstruct'},
+  {kind:'tactic', id:'clear_tasks'},
+  {kind:'tactic', id:'tr4'},
+  {kind:'tactic', id:'tl1'},
+  {kind:'tactic', id:'tb1'},
+  {kind:'buff', id:'anchor'},
+  {kind:'tactic', id:'tb2'}
+];
+
+const ENEMIES={
+ thought:{name:'Thought',hp:32,speed:.70,armor:0,damage:1,size:'small', baseLeak:3, baseGold:3},
+ urgency:{name:'Urgency',hp:30,speed:1.16,armor:0,damage:1,size:'small', baseLeak:4, baseGold:4},
+ shell:{name:'Shell',hp:115,speed:.49,armor:12,damage:2,size:'large', baseLeak:8, baseGold:9},
+ repeat:{name:'Repeat',hp:70,speed:.63,armor:0,damage:1,size:'mid', baseLeak:6, baseGold:7, special:'split'},
+ smallThought:{name:'Small Thought',hp:20,speed:.84,armor:0,damage:1,size:'small', baseLeak:2, baseGold:2},
+ rational:{name:'Rationalization',hp:90,speed:.56,armor:0,damage:2,size:'mid', baseLeak:8, baseGold:10},
+ noise:{name:'Noise',hp:80,speed:.60,armor:0,damage:2,size:'mid', baseLeak:9, baseGold:11},
+ avoid:{name:'Avoidance',hp:60,speed:.81,armor:0,damage:1,size:'small', baseLeak:6, baseGold:8},
+ numb:{name:'Numbness',hp:200,speed:.39,armor:5,damage:3,size:'large', baseLeak:12, baseGold:16},
+ deadline:{name:'Deadline Boss',hp:2000,speed:.32,armor:15,damage:5,size:'boss', baseLeak:100, baseGold:0, special:'boss'}
+};
+
+const WAVES=[
+ {list:[['thought',8]], interval:1.1}, // Mon
+ {list:[['thought',8],['urgency',4]], interval:1.0}, // Tue
+ {list:[['thought',8],['shell',3]], interval:1.2}, // Wed
+ {list:[['thought',8],['repeat',5]], interval:1.0}, // Thu
+ {list:[['thought',8],['urgency',6],['rational',3]], interval:.9}, // Fri
+ {list:[['thought',6],['shell',5],['noise',3],['avoid',3]], interval:.9}, // Sat
+ {list:[['deadline',1],['thought',10],['urgency',6],['shell',3],['rational',2],['noise',2],['avoid',3]], interval:.8} // Sun
+];
+
+let state;
+
+// 状态快照保存，用于失败时重试
+function createSnapshot() {
+    return {
+        day: state.day, phase: state.phase, wave: state.wave, stress: state.stress,
+        gold: state.gold, ap: state.ap, workLv: state.workLv, knowledgeLv: state.knowledgeLv,
+        restaurantLv: state.restaurantLv,
+        towerInventory: {...state.towerInventory}, buffInventory: {...state.buffInventory},
+        tacticInventory: {...state.tacticInventory},
+        placedTowers: state.placedTowers.map(t => ({...t})) // 深度拷贝已放置的塔
+    };
+}
+function loadSnapshot(snap) {
+    if(!snap) return newGame();
+    state.day = snap.day; state.phase = snap.phase; state.wave = snap.wave; state.stress = snap.stress;
+    state.gold = snap.gold; state.ap = snap.ap; state.workLv = snap.workLv; state.knowledgeLv = snap.knowledgeLv;
+    state.restaurantLv = snap.restaurantLv;
+    state.towerInventory = {...snap.towerInventory}; state.buffInventory = {...snap.buffInventory};
+    state.tacticInventory = {...snap.tacticInventory};
+    // 恢复对 def 对象的引用
+    state.placedTowers = snap.placedTowers.map(t => { t.def = towerById[t.id]; return t; });
+    state.enemies=[]; state.projectiles=[]; state.fx=[]; state.tempStressReduction=0; state.spawner=null;
+    updateAllUI();
+}
+
+function newGame(){
+ state={
+  day: 1, phase:'day', wave:1, stress:0, tempStressReduction:0, gold:100, ap:3,
+  knowledge:0, knowledgeLv:1, work:0, workLv:1, restaurantLv:1,
+  towerInventory:{}, buffInventory:{}, tacticInventory:{}, 
+  activeBuffIds:[], equippedTactics:[], tacticSlots:1, buffSlots:1,
+  placedTowers:[], selectedTowerId:null, selectedPlaced:null, placementMode:null,
+  enemies:[], projectiles:[], fx:[], blockers:[], spawner:null, combatTime:0, timeScale:1, 
+  waveMultipliers: {hp:1, spd:1, gold:1, leak:1}, effStress: 0,
+  temp:{towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false},
+  daySnapshot: null, nightSnapshot: null
+ };
+ addTowerToInventory('focus_note',1,false); addTowerToInventory('calm_spray',1,false);
+ player.r=0; player.c=4; player.x=centerOf(0,4).x; player.y=centerOf(0,4).y;
+ state.daySnapshot = createSnapshot();
+ updateAllUI();
+}
+
+const player={r:0,c:4,x:0,y:0};
+function badge(r){return `<span class="badge ${RARITY_CLASS[r]||''}">${RARITY[r]||r}</span>`;}
+function log(msg){
+ const el=document.getElementById('logList'); const t=document.createElement('div');
+ t.textContent=`[${DAYS[state.day-1]||'Sunday'}] ${msg}`;
+ if(el){el.prepend(t); while(el.children.length>80) el.lastChild.remove();}
+}
+function showToast(msg,ms=2200){
+ const t=document.getElementById('toast'); t.innerHTML=msg; t.classList.remove('hidden');
+ clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>t.classList.add('hidden'),ms);
+}
+function unlockAudio(){ if(audio.ctx) return; try{ audio.ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+const audio={ctx:null,on:true};
+function beep(freq=600,dur=.08,type='sine',vol=.035){
+ if(!audio.on||!audio.ctx) return;
+ const o=audio.ctx.createOscillator(), g=audio.ctx.createGain(); o.frequency.value=freq; o.type=type; g.gain.value=vol;
+ o.connect(g); g.connect(audio.ctx.destination); o.start();
+ g.gain.exponentialRampToValueAtTime(0.0001,audio.ctx.currentTime+dur); o.stop(audio.ctx.currentTime+dur);
+}
+
+function addTowerToInventory(id,n=1,notify=true){ state.towerInventory[id]=(state.towerInventory[id]||0)+n; if(notify) log(`Acquired Tower [${towerById[id].name}] ×${n}`); }
+function addBuffToInventory(id){ const d=buffById[id]; if(state.buffInventory[id]){ const back=Math.round(d.price*.5); state.gold+=back; log(`Duplicate Buff converted to +${back} Gold`); }else{ state.buffInventory[id]=1; log(`Acquired Buff [${d.name}]`); } }
+function addTacticToInventory(id){ const d=tacticById[id]; if(state.tacticInventory[id]){ const back=Math.round(d.price*.5); state.gold+=back; log(`Duplicate Tactic converted to +${back} Gold`); }else{ state.tacticInventory[id]=1; log(`Acquired Tactic [${d.name}]`); } }
+
+function showModal(title, text, choices=[], extra='', bgUrl='', layout=''){
+ const m=document.getElementById('modal'), body=document.getElementById('modalBody');
+ body.style.backgroundImage = bgUrl ? `url('${bgUrl}')` : 'none'; body.style.backgroundSize='cover';
+ let html='';
+ 
+ // 普通居中弹窗缩小
+ if(!bgUrl && !layout){
+    body.className = 'modalCard smallModal';
+ } else {
+    body.className = 'modalCard';
+ }
+
+ if(bgUrl && layout==='indoor'){
+    html=`<div style="width: 36%; margin-left: auto; margin-right: 2%; margin-top: 2%; transform: translateX(12px);">
+      <h2 style="border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom:5px;">${title}</h2><p style="font-weight: bold;">${text}</p>${extra}
+      <div class="choiceGrid" style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+      ${choices.map((c,i)=>{
+        const danger=c.danger?'color:red;':'';
+        const isLeave = c.title === 'Leave';
+        const btnClass = isLeave ? 'choice leave-btn' : (c.primary ? 'choice primary' : 'choice ghost');
+        return `<button class="${btnClass}" data-i="${i}" style="text-align:left; padding:12px; ${isLeave?'':'border:1px solid rgba(0,0,0,0.2);'}">
+        <b>${c.title}</b><br><span style="font-size:12px; font-weight:normal; ${danger}">${c.text}</span></button>`;
+      }).join('')}</div></div>`;
+ } else if(layout==='reward') {
+    // 无边框、背景黑字的奖励界面
+    html=`<h2 style="color:#ffc857; font-weight:bold; font-size:24px;">${title}</h2><p style="color:#333;">${text}</p>${extra}
+    <div class="rewardGrid">
+    ${choices.map((c,i)=>`
+      <button class="choice rewardBtn" data-i="${i}">
+        ${c.imgHtml ? c.imgHtml : ''}
+        <b style="font-size:16px;">${c.title}</b><br>
+        <span style="font-size:12px;font-weight:normal;color:#000;">${c.text||''}</span>
+      </button>`).join('')}
+    </div>`;
+ } else {
+    html=`<h2>${title}</h2><p>${text}</p>${extra}<div class="choiceGrid" style="display:flex; justify-content:center; gap: 15px;">
+    ${choices.map((c,i)=>`<button class="choice ${c.primary?'primary':'ghost'}" data-i="${i}"><b>${c.title}</b><br><span style="font-size:11px;font-weight:normal;">${c.text||''}</span></button>`).join('')}</div>`;
+ }
+ body.innerHTML=html; m.classList.remove('hidden');
+ body.querySelectorAll('.choice').forEach(btn=>{
+   btn.onclick = () => {
+     if(btn.dataset.i !== undefined){
+       const choice = choices[Number(btn.dataset.i)];
+       if(choice && typeof choice.cb === 'function') choice.cb();
+     }
+   };
+ });
+}
+function closeModal(){document.getElementById('modal').classList.add('hidden');}
+
+function nearestBuilding(){
+ let best=null;
+ for(const [cellType,bid] of Object.entries(CELL_TO_BUILDING)){
+  const cells=cellsByType[cellType]||[];
+  for(const cell of cells){
+    const d=Math.max(Math.abs(cell.r-player.r), Math.abs(cell.c-player.c));
+    if(d<=2 && (!best||d<best.d)) best={id:bid, name:BUILDING_NAMES[bid], d};
+  }
+ }
+ return best;
+}
+
+document.addEventListener('keydown',e=>{
+ if(!document.getElementById('modal').classList.contains('hidden')) return;
+ let dr=0,dc=0;
+ if(['ArrowUp','w','W'].includes(e.key))dr=-1; if(['ArrowDown','s','S'].includes(e.key))dr=1;
+ if(['ArrowLeft','a','A'].includes(e.key))dc=-1; if(['ArrowRight','d','D'].includes(e.key))dc=1;
+ if(dr||dc){
+   const nr=player.r+dr, nc=player.c+dc;
+   if(inBounds(nr,nc) && walkableTypes.has(cellMap[nr][nc])){ player.r=nr; player.c=nc; const p=centerOf(nr,nc); player.x=p.x; player.y=p.y; }
+   updateNearPrompt(); e.preventDefault();
+ }
+ if(e.code==='Space'){ 
+     const b=nearestBuilding(); 
+     if(b && state.phase==='day') { 
+         if(b.id==='shop') showToast('Shop is closed during day. Click it at night deploy phase.'); 
+         else openIndoor(b.id); e.preventDefault(); 
+     } 
+ }
+});
+function updateNearPrompt(){
+ const b=nearestBuilding(), p=document.getElementById('nearPrompt');
+ if(state.phase==='day' && b && b.id!=='shop'){ p.textContent=`Near [${b.name}], Press Space`; p.classList.remove('hidden');}
+ else p.classList.add('hidden');
+}
+
+function progressThen(title, done){
+ const extra=`<div class="progressWrap"><div id="progressBar" class="progressBar"></div></div>`;
+ showModal(title,'Processing...',[],extra);
+ let p=0; const bar=()=>document.getElementById('progressBar');
+ const timer=setInterval(()=>{ p+=14; if(bar()) bar().style.width=Math.min(100,p)+'%'; if(p>=100){ clearInterval(timer); done(); } },100);
+}
+
+function openIndoor(id){
+ const actions=[];
+ if(id==='office') {
+   const lv = state.workLv, gold = 25+lv*15, str = 8+lv*2;
+   const nextStr = state.stress + str;
+   const disabled = state.ap < 1;
+   actions.push({title:'Work', primary:!disabled, danger:nextStr>=100, text:`-1 AP | +${gold} Gold | Stress +${str} (Next: ${nextStr})`, cb:()=>{if(!disabled) doAction(1, ()=>{state.gold+=gold; addStress(str);}, id)}});
+ }
+ else if(id==='library'){
+   const lv = state.knowledgeLv, str = 7+lv*2; const nextStr = state.stress + str;
+   const disabled = state.ap < 1;
+   actions.push({title:'Study', primary:!disabled, danger:nextStr>=100, text:`-1 AP | Unlock Tower | Stress +${str} (Next: ${nextStr})`, cb:()=>{if(!disabled) doAction(1, ()=>{addStress(str);}, id)}});
+ }
+ else if(id==='restaurant'){
+   const lv = state.restaurantLv, c1 = 35+(lv-1)*20, s1 = 12+(lv-1)*6;
+   const c2 = 30+(lv-1)*20, tempS = 15+(lv-1)*10;
+   const disabled1 = state.ap < 1 || state.gold < c1;
+   const disabled2 = state.ap < 1 || state.gold < c2;
+   actions.push({title:'Enjoy Meal (Permanent)', primary:!disabled1, text:`-1 AP, -${c1} Gold | Stress -${s1} (Next: ${Math.max(0,state.stress-s1)})`, cb:()=>{if(!disabled1) doAction(1, ()=>{state.gold-=c1; addStress(-s1);}, id)}});
+   actions.push({title:'Feast (Temp Night Relief)', primary:false, text:`-1 AP, -${c2} Gold | Effective Stress Tonight -${tempS}`, cb:()=>{if(!disabled2) doAction(1, ()=>{state.gold-=c2; state.tempStressReduction+=tempS;}, id)}});
+ }
+ else if(id==='dorm'){
+   const d1=state.stress+8, d2=state.stress+18, d3=state.stress+28;
+   const disabled = state.ap < 1;
+   actions.push({title:'All Nighter (Gold)', primary:false, danger:d1>=100, text:`-1 AP | +50 Gold | Stress +8 (Next: ${d1})`, cb:()=>{if(!disabled) doAction(1,()=>{state.gold+=50; addStress(8);},id)}});
+   actions.push({title:'Late Plan (Buff)', primary:false, danger:d2>=100, text:`-1 AP | Random Buff | Stress +18 (Next: ${d2})`, cb:()=>{if(!disabled) doAction(1,()=>{addBuffToInventory('pb2'); addStress(18);},id)}});
+   actions.push({title:'Overdraw (Rare Tower)', primary:false, danger:d3>=100, text:`-1 AP | Rare Tower | Stress +28 (Next: ${d3})`, cb:()=>{if(!disabled) doAction(1,()=>{addTowerToInventory('tomato_clock'); addStress(28);},id)}});
+ }
+ actions.push({title:'Leave', primary:false, text:'', cb:closeModal});
+ showModal(BUILDING_NAMES[id], 'Choose your action:', actions, '', INDOOR_BGS[id], 'indoor');
+}
+
+function doAction(apCost, effect, id){
+ closeModal();
+ progressThen(BUILDING_NAMES[id],()=>{
+   state.ap-=apCost; effect(); updateAllUI();
+   if(state.stress<100) showModal('Done', 'Action completed.', [{title:'OK', cb:closeModal}]);
+ });
+}
+
+
+
+// REMOVED: Duplicate openBuffTacticShop function - using the version at line 1212 instead
+
+window.buyShopItem = function(kind, id) {
+    let d = kind==='buff' ? buffById[id] : tacticById[id];
+    if(state.gold >= d.price) {
+        state.gold -= d.price;
+        if(kind==='buff') addBuffToInventory(id); else addTacticToInventory(id);
+        updateAllUI();
+        beep(1200,.09,'triangle');
+        openBuffTacticShop(); // Refresh UI to update disabled buttons
+    }
+}
+
+// REMOVED: Duplicate enterNight function - using the newer version at line 1392 instead
+
+function startBattle(){
+ if(state.phase!=='deploy') return;
+ state.effStress = Math.max(0, state.stress - state.tempStressReduction);
+ state.waveMultipliers = calcWaveMultipliers(state.effStress);
+ 
+ state.phase='battle'; state.enemies=[]; state.projectiles=[]; state.fx=[]; state.combatTime=0;
+ state.temp={towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false};
+ 
+ for(const bid of state.activeBuffIds){
+  const b=buffById[bid];
+  if(b?.mods){ for(const [k,v] of Object.entries(b.mods)) state.temp[k]=v; }
+  if(b?.apply) b.apply();
+ }
+ if(state.stress>=100) return; // applied buff might have triggered game over
+
+ const w=WAVES[state.wave-1]; const q=[];
+ for(const [id,n] of w.list) for(let i=0;i<n;i++) q.push(id);
+ state.spawner = {queue:q, timer:.5, interval:w.interval};
+ state.placedTowers.forEach(t=>{t.cool=0;t.disabled=0;});
+ beep(860,.12,'triangle'); updateAllUI();
+}
+
+function spawnEnemy(id){
+ const def=ENEMIES[id]; const start=pickStartCell(); const path=findPath(start); if(!path) return;
+ const hp=Math.max(1, Math.round(def.hp * state.waveMultipliers.hp));
+ state.enemies.push({id:Math.random().toString(36).slice(2),type:id,def,hp,maxHp:hp,x:path[0].x,y:path[0].y,path,pi:1,progress:0,slow:0,slowMul:1,stun:0,hitTimer:0});
+}
+
+// REMOVED: Duplicate showRewardModal function - using the version that calls sampleRewardItem() at line 1254
+
+// REMOVED: Duplicate endWave function - using the newer version at line 1402 instead
+
+function updateCombat(dt){
+ const logicDt=dt*state.timeScale; state.combatTime+=logicDt;
+ if(state.spawner && state.spawner.queue.length){
+  state.spawner.timer-=logicDt;
+  if(state.spawner.timer<=0){ spawnEnemy(state.spawner.queue.shift()); state.spawner.timer=state.spawner.interval; }
+ }
+ 
+ for(const e of [...state.enemies]){
+  if(e.slow>0){e.slow-=logicDt; if(e.slow<=0)e.slowMul=1;}
+  if(e.stun>0){e.stun-=logicDt; continue;}
+  if(e.hitTimer>0) e.hitTimer-=logicDt;
+  if(e.pi>=e.path.length){ leakEnemy(e); continue; }
+  
+  const target=e.path[e.pi], dx=target.x-e.x, dy=target.y-e.y, d=Math.hypot(dx,dy);
+  const speed = e.def.speed * C * state.waveMultipliers.spd * state.temp.enemySpeed * e.slowMul;
+  const step = speed*logicDt;
+  if(d<=step){ e.x=target.x; e.y=target.y; e.pi++; e.progress=e.pi/e.path.length; if(e.pi>=e.path.length) leakEnemy(e); }
+  else { e.x+=dx/d*step; e.y+=dy/d*step; e.progress=(e.pi/e.path.length); }
+ }
+ 
+ for(const t of state.placedTowers){
+  t.cool-=logicDt;
+  if(t.cool<=0){
+   const s={atk:t.def.atk*state.temp.towerDamage,rate:t.def.rate*state.temp.towerRate,range:t.def.range*state.temp.towerRange,aoe:t.def.aoe};
+   t.cool=1/Math.max(.1,s.rate);
+   const arr=state.enemies.filter(e=>dist(t,e)<=s.range*C);
+   if(arr.length) {
+     const tar=arr[0];
+     state.projectiles.push({x:t.x,y:t.y,target:tar,damage:s.atk,aoe:s.aoe*C,speed:C*10,tower:t});
+     beep(720,.025,'triangle',.01);
+   }
+  }
+ }
+ 
+ for(const p of [...state.projectiles]){
+  const target=p.target; if(!state.enemies.includes(target)){ state.projectiles=state.projectiles.filter(x=>x!==p); continue; }
+  const d=dist(p,target), step=p.speed*logicDt;
+  if(d<=step){
+   if(p.aoe>0){ for(const e of state.enemies) if(dist(target,e)<=p.aoe) damageEnemy(e,p.damage); }
+   else damageEnemy(target,p.damage);
+   state.projectiles=state.projectiles.filter(x=>x!==p);
+  }
+  else { p.x+=(target.x-p.x)/d*step; p.y+=(target.y-p.y)/d*step; }
+ }
+ 
+ for(const f of state.fx) f.life-=dt; state.fx=state.fx.filter(f=>f.life>0);
+ if(state.spawner && state.spawner.queue.length===0 && state.enemies.length===0 && state.projectiles.length===0) endWave();
+ updateAllUI(false);
+}
+
+function damageEnemy(e,dmg){
+ if(!state.enemies.includes(e)) return;
+ e.hp-=Math.max(1,dmg-(e.def.armor||0)); 
+ e.hitTimer = 0.2; // 0.2s 泛红
+ if(e.hp<=0) {
+    state.enemies=state.enemies.filter(x=>x!==e);
+    const drop = Math.max(1, Math.round(e.def.baseGold * state.waveMultipliers.gold));
+    if(drop>0) { state.gold+=drop; state.fx.push({kind:'coin',x:e.x,y:e.y,val:drop,life:1.0}); }
+    state.fx.push({kind:'smoke',x:e.x,y:e.y,life:0.4});
+    beep(e.def.size==='large'?350:e.def.size==='mid'?520:700,.06,e.def.size==='large'?'square':'sine',.025);
+    
+    if(e.def.special==='boss') endWave();
+ }
+}
+
+function leakEnemy(e){
+ if(!state.enemies.includes(e)) return;
+ state.enemies=state.enemies.filter(x=>x!==e);
+ const leakStr = Math.max(1, Math.round(e.def.baseLeak * state.waveMultipliers.leak));
+ state.fx.push({kind:'coreHit',x:e.x,y:e.y,life:0.5}); beep(120,.25,'sawtooth',.05);
+ addStress(leakStr); log(`Leaked Enemy: Stress +${leakStr}`);
+}
+
+canvas.addEventListener('click',evt=>{
+ const rect=canvas.getBoundingClientRect(), x=(evt.clientX-rect.left)*(canvas.width/rect.width), y=(evt.clientY-rect.top)*(canvas.height/rect.height);
+ const g=gridOf(x,y);
+ if(state.phase==='deploy' || state.phase==='battle'){
+   if(cellMap[g.r]?.[g.c]==='商店' && state.phase==='deploy') return openBuffTacticShop();
+   const placed=state.placedTowers.find(t=>t.r===g.r&&t.c===g.c);
+   if(placed){ state.selectedPlaced=placed.uid; state.selectedTowerId=null; updateAllUI(); return; }
+   if(cellMap[g.r]?.[g.c]==='tower' && state.selectedTowerId){
+    if(state.placedTowers.some(t=>t.r===g.r&&t.c===g.c)) return;
+    if((state.towerInventory[state.selectedTowerId]||0)<=0) return showToast('Out of stock in inventory.');
+    const def=towerById[state.selectedTowerId]; state.towerInventory[state.selectedTowerId]--;
+    const p=centerOf(g.r,g.c);
+    state.placedTowers.push({uid:Date.now(), id:def.id, def, r:g.r,c:g.c,x:p.x,y:p.y,level:0,cool:0});
+    beep(880,.08,'triangle'); updateAllUI();
+   }
+ }
+});
+
+let last=performance.now();
+function loop(now){
+ const dt=Math.min(.05,(now-last)/1000); last=now;
+ if(state?.phase==='battle') updateCombat(dt); else if(state) { for(const f of state.fx) f.life-=dt; state.fx=state.fx.filter(f=>f.life>0); }
+ draw(); requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+
+// REMOVED: Duplicate draw function - using the version at line 1351 instead
+
+function roundRect(x,y,w,h,r,fill,stroke){ ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath(); if(fill)ctx.fill(); if(stroke)ctx.stroke(); }
+
+// REMOVED: Duplicate updateAllUI function - using the newer version at line 1413 instead
+function setTab(name){
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+ document.querySelectorAll('.tabPane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+name));
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>setTab(t.dataset.tab));
+document.querySelectorAll('.speedGroup button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.speedGroup button').forEach(btn=>btn.classList.remove('active')); b.classList.add('active'); state.timeScale=+b.dataset.speed; });
+
+document.getElementById('startBattleBtn').onclick=startBattle;
+document.getElementById('cancelBtn').onclick=()=>{state.selectedTowerId=null;state.selectedPlaced=null;updateAllUI();};
+document.getElementById('restartBtn').onclick=()=>showModal('Restart Game','Are you sure?',[{title:'Confirm',cb:()=>{closeModal();newGame();}},{title:'Cancel',cb:closeModal}]);
+document.getElementById('audioBtn').onclick=()=>{audio.on=!audio.on;document.getElementById('audioBtn').textContent=audio.on?'🔊':'🔇';};
+document.getElementById('buyBuffSlot').onclick=()=>{if(state.buffSlots>=3||state.gold<50)return showToast('Maxed or lacking gold.'); state.gold-=50; state.buffSlots++; updateAllUI();};
+document.getElementById('buyTacSlot').onclick=()=>{if(state.tacticSlots>=3||state.gold<50)return showToast('Maxed or lacking gold.'); state.gold-=50; state.tacticSlots++; updateAllUI();};
+
+let highStressToastLock = false;
+
+function triggerHighStressWarning(){
+  if(!state || state.stress < 70 || highStressToastLock) return;
+  highStressToastLock = true;
+  showToast(`High stress: ${state.stress}!`, 1800);
+  setTimeout(()=>{ highStressToastLock = false; }, 1800);
+}
+
+function sampleRewardItem(){
+  const kind = rand(['tower','buff','tactic']);
+  const rarityRoll = Math.random();
+  const rarity = rarityRoll < 0.60 ? 'basic' : (rarityRoll < 0.90 ? 'rare' : 'legendary');
+  if(kind === 'tower') return {kind, id: rand(TOWERS.filter(t=>t.rarity===rarity)).id};
+  if(kind === 'buff') return {kind, id: rand(BUFFS.filter(b=>b.rarity===rarity)).id};
+  return {kind, id: rand(TACTICS.filter(t=>t.rarity===rarity)).id};
+}
+
+function restartCurrentStage(){
+  if(state.phase === 'day') return loadSnapshot(state.daySnapshot);
+  if(state.nightSnapshot) return loadSnapshot(state.nightSnapshot);
+  return loadSnapshot(state.daySnapshot);
+}
+
+function getShopItemDef(item){
+  return item.kind === 'buff' ? buffById[item.id] : tacticById[item.id];
+}
+
+function buyNightShopItem(item){
+  const def = getShopItemDef(item);
+  if(!def) return;
+  if(state.gold < def.price) return showToast('Not enough gold.');
+  state.gold -= def.price;
+  if(item.kind === 'buff') addBuffToInventory(item.id);
+  else addTacticToInventory(item.id);
+  beep(1200,.09,'triangle');
+  updateAllUI();
+  openBuffTacticShop();
+}
+
+function buildNightShopCard(item, index){
+  const def = getShopItemDef(item);
+  if(!def) return '';
+  const imgSrc = SHOP_ITEM_PATHS[item.id] || TACTIC_IMGS[item.id] || '';
+  const power = def.power ?? Math.max(8, Math.round((def.price || 40) / 4));
+  return `<div style="background:rgba(255,248,235,0.94);border:1px solid rgba(92,56,12,.18);border-radius:14px;padding:14px;color:#1f1306;box-shadow:0 4px 14px rgba(0,0,0,.14);">
+    <img src="${imgSrc}" style="width:70px;height:70px;object-fit:contain;display:block;margin:0 auto 10px;" onerror="this.style.opacity='0.3'">
+    <div style="font-weight:900;text-align:center;min-height:42px;">${def.name}</div>
+    <div style="font-size:11px;text-align:center;color:#8a5a1b;margin:4px 0 8px;">${item.kind === 'buff' ? 'BUFF' : 'ITEM'}</div>
+    <div style="font-size:12px;line-height:1.45;min-height:54px;">${def.desc}</div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:bold;margin:10px 0 12px;"><span>Power ${power}</span><span>${def.price} G</span></div>
+    <button class="primary" data-shop-buy="${index}" style="width:100%;" ${state.gold < def.price ? 'disabled' : ''}>Buy</button>
+  </div>`;
+}
+
+function renderInventories(){
+  const ti=document.getElementById('towerInv'); ti.innerHTML='';
+  for(const [id,n] of Object.entries(state.towerInventory)){
+    if(n<=0) continue;
+    const d=towerById[id];
+    const div=document.createElement('div');
+    div.className='item'+(state.selectedTowerId===id?' selected':'');
+    div.innerHTML=`<div class="item-content"><img src="${TOWER_IMGS[d.id]||''}" class="item-img"><div class="item-info"><div class="head"><b>${d.name} ×${n}</b>${badge(d.rarity)}</div><div class="item-stats"><span>ATK: ${d.atk}</span><span>SPD: ${d.rate}</span><span>RNG: ${d.range}</span></div></div></div><button class="primary" style="margin-top:6px">Select to Place</button>`;
+    div.querySelector('button').onclick=()=>{state.selectedTowerId=id;state.selectedPlaced=null;updateAllUI();};
+    ti.appendChild(div);
+  }
+
+  const bi=document.getElementById('buffInv'); bi.innerHTML='';
+  for(const [id] of Object.entries(state.buffInventory)){
+    const d=buffById[id];
+    const div=document.createElement('div');
+    div.className='item'+(state.activeBuffIds.includes(id)?' selected':'');
+    div.innerHTML=`<div class="item-content"><img src="${SHOP_ITEM_PATHS[id]||''}" class="item-img"><div class="item-info"><div class="head"><b>${d.name}</b></div><p>${d.desc}</p></div></div><button class="primary" style="margin-top:6px">${state.activeBuffIds.includes(id)?'Remove':'Activate'}</button>`;
+    div.querySelector('button').onclick=()=>toggleBuff(id);
+    bi.appendChild(div);
+  }
+
+  const tac=document.getElementById('tacticInv'); tac.innerHTML='';
+  for(const [id] of Object.entries(state.tacticInventory)){
+    const d=tacticById[id];
+    const selected=state.equippedTactics.some(t=>t.id===id && !t.used);
+    const div=document.createElement('div');
+    div.className='item'+(selected?' selected':'');
+    div.innerHTML=`<div class="item-content"><img src="${SHOP_ITEM_PATHS[id]||TACTIC_IMGS[id]||''}" class="item-img"><div class="item-info"><div class="head"><b>${d.name}</b></div><p>${d.desc}</p></div></div><button class="primary" style="margin-top:6px">${selected?'Unequip':'Equip'}</button>`;
+    div.querySelector('button').onclick=()=>toggleTactic(id);
+    tac.appendChild(div);
+  }
+}
+
+function renderBattleTactics(){
+  const box = document.getElementById('battleTactics');
+  box.innerHTML = '';
+  state.equippedTactics.forEach(t=>{
+    const def = tacticById[t.id];
+    const div=document.createElement('div');
+    div.className='item';
+    div.innerHTML=`<div class="item-content"><img src="${SHOP_ITEM_PATHS[t.id]||TACTIC_IMGS[t.id]||''}" class="item-img"><div class="item-info"><div class="head"><b>${def.name}</b></div><div style="font-size:11px;color:#333;">${def.desc}</div></div></div><button class="primary" style="margin-top:6px" ${t.used?'disabled':''}>Use</button>`;
+    div.querySelector('button').onclick=()=>useTactic(t.id);
+    box.appendChild(div);
+  });
+}
+
+function useTactic(id){
+  if(state.phase!=='battle') return;
+  const eq = state.equippedTactics.find(t=>t.id===id && !t.used);
+  const def = tacticById[id];
+  if(!eq || !def) return;
+  if(id==='tb1'){
+    state.temp.towerRate *= 1.2;
+    addStress(5);
+    setTimeout(()=>{ state.temp.towerRate /= 1.2; }, 8000);
+  } else if(id==='tb2'){
+    addStress(-6);
+  } else if(id==='tr1' || id==='sticky_block'){
+    state.enemies.forEach(e=>{ e.slow = Math.max(e.slow, 5); e.slowMul = Math.min(e.slowMul, 0.55); });
+  } else if(id==='tr4'){
+    addStress(-12);
+  } else if(id==='tl1'){
+    state.enemies.forEach(e=>{ e.stun = Math.max(e.stun, e.def.size==='boss' ? 2 : 4); });
+  } else if(id==='clear_tasks'){
+    state.enemies.forEach(e=>{ e.hp -= 35; });
+  } else if(id==='route_reconstruct'){
+    state.enemies.forEach(e=>{
+      e.pi = Math.max(1, e.pi - Math.ceil(e.path.length * 0.25));
+      const target = e.path[e.pi-1];
+      if(target){ e.x = target.x; e.y = target.y; }
+    });
+  }
+  eq.used = true;
+  if(def.consume) delete state.tacticInventory[id];
+  showToast(`${def.name} used.`);
+  updateAllUI();
+}
+
+function toggleBuff(id){
+  if(state.phase!=='deploy') return showToast('Buffs can only be activated during deploy.');
+  const i=state.activeBuffIds.indexOf(id);
+  if(i>=0) state.activeBuffIds.splice(i,1);
+  else{
+    if(state.activeBuffIds.length>=state.buffSlots) return showToast('No free buff slot.');
+    state.activeBuffIds.push(id);
+  }
+  updateAllUI();
+}
+
+function toggleTactic(id){
+  if(state.phase!=='deploy') return showToast('Items can only be equipped during deploy.');
+  const i=state.equippedTactics.findIndex(t=>t.id===id);
+  if(i>=0) state.equippedTactics.splice(i,1);
+  else{
+    if(state.equippedTactics.length>=state.tacticSlots) return showToast('No free item slot.');
+    state.equippedTactics.push({id,used:false});
+  }
+  updateAllUI();
+}
+
+function openBuffTacticShop() {
+  const html = `<div style="font-weight:900;font-size:28px;text-align:center;color:#fff7dd;text-shadow:0 2px 10px rgba(0,0,0,.35);">Buff & Item Shop</div>
+    <div style="font-size:14px;text-align:center;color:#fff5d2;margin:6px 0 16px;">Buy support items for tonight's defense.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;max-height:58vh;overflow:auto;padding:6px;">
+      ${NIGHT_SHOP_CATALOG.map((item, index) => buildNightShopCard(item, index)).join('')}
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;"><button id="nightShopClose" class="ghost">Close</button></div>`;
+  showModal('Buff & Item Shop', '', [], html, ASSETS.shopModal, 'shop');
+  document.querySelectorAll('[data-shop-buy]').forEach(btn=>{
+    btn.onclick = ()=>buyNightShopItem(NIGHT_SHOP_CATALOG[Number(btn.dataset.shopBuy)]);
+  });
+  document.getElementById('nightShopClose').onclick = closeModal;
+}
+
+function showRewardModal(title='Reward', afterCb=()=>{}){
+  const choices = [sampleRewardItem(), sampleRewardItem(), sampleRewardItem()];
+  showModal(title, 'Choose 1 reward.', choices.map(item=>{
+    const def = item.kind === 'tower' ? towerById[item.id] : item.kind === 'buff' ? buffById[item.id] : tacticById[item.id];
+    const imgSrc = item.kind === 'tower' ? TOWER_IMGS[item.id] : SHOP_ITEM_PATHS[item.id] || TACTIC_IMGS[item.id] || '';
+    return {
+      title: def.name,
+      text: `${item.kind.toUpperCase()}<br><br>${def.desc}`,
+      imgHtml: imgSrc ? `<img src="${imgSrc}" style="width:60px;height:60px;display:block;margin:0 auto 10px;">` : '',
+      cb: ()=>{
+        if(item.kind === 'tower') addTowerToInventory(item.id);
+        else if(item.kind === 'buff') addBuffToInventory(item.id);
+        else addTacticToInventory(item.id);
+        closeModal();
+        afterCb();
+      }
+    };
+  }), '', ASSETS.buffModal, 'reward');
+}
+
+function addStress(v) {
+  state.stress = Math.max(0, state.stress + v);
+  triggerHighStressWarning();
+  if(state.stress >= 100) {
+    if(state.temp && state.temp.lastBreath) {
+      state.stress = 99;
+      state.temp.lastBreath = false;
+      showToast('Last Breath triggered! Stress locked at 99!');
+    } else {
+      state.phase = 'gameover';
+      updateAllUI();
+      showModal('Oops, 100 Stress', 'You could not handle the pressure.', [
+        {title:'Restart Current Stage', primary:true, cb:()=>{closeModal(); restartCurrentStage();}},
+        {title:'Back To Day 1', cb:()=>{closeModal(); newGame();}}
+      ]);
+    }
+  }
+}
+
+function enterNight(){
+ if(state.phase!=='day') return;
+ const go = ()=>{
+   state.nightSnapshot = createSnapshot();
+   state.phase='deploy';
+   state.activeBuffIds=[];
+   state.equippedTactics=[];
+   state.selectedTowerId=null;
+   state.selectedPlaced=null;
+   showToast('Entering Night Phase. Click the shop building for buffs and items.');
+   updateAllUI();
+ };
+ showRewardModal(`Nightfall Reward - ${DAYS[state.day-1]||'Sunday'}`, go);
+}
+
+function endWave(){
+ if(state.phase!=='battle') return;
+ state.phase='reward';
+ state.enemies=[];
+ state.projectiles=[];
+ state.fx=[];
+ state.spawner=null;
+ let postWaveReduce = 0;
+ state.placedTowers.forEach(t=>{
+   if(t.def.special==='recover3') postWaveReduce += 3;
+   if(t.def.special==='recover4') postWaveReduce += 4;
+ });
+ if(postWaveReduce>0) {
+   addStress(-postWaveReduce);
+   log(`Rest Towers active: Stress -${postWaveReduce}`);
+ }
+ state.tempStressReduction = 0;
+ state.ap = 3;
+ for(const bid of [...state.activeBuffIds]){
+   if(buffById[bid]?.kind === 'One-time'){
+     delete state.buffInventory[bid];
+     state.activeBuffIds = state.activeBuffIds.filter(x=>x!==bid);
+   }
+ }
+ if(state.day >= 7){
+   showModal('Victory!', 'You survived the final night!', [
+     {title:'Restart Current Stage', primary:true, cb:()=>{closeModal(); restartCurrentStage();}},
+     {title:'Back To Day 1', cb:()=>{closeModal(); newGame();}}
+   ]);
+   return;
+ }
+ showRewardModal(`Cleared ${DAYS[state.day-1]||'Sunday'}`, ()=>{
+   state.day++;
+   state.wave++;
+   state.phase='day';
+   state.daySnapshot = createSnapshot();
+   updateAllUI();
+   showModal(`Start of ${DAYS[state.day-1]||'Sunday'}`, 'A new daytime begins.', [{title:'Start Day', primary:true, cb:closeModal}]);
+ });
+}
+
+function updateAllUI(lists=true){
+ if(!state) return;
+ document.getElementById('hudDay').textContent = DAYS[state.day-1] || 'Sunday';
+ document.getElementById('hudGold').textContent = Math.round(state.gold);
+ document.getElementById('hudAP').textContent = state.ap;
+ const stressEl = document.getElementById('hudStress');
+ stressEl.textContent = state.stress;
+ stressEl.style.color = state.stress >= 70 ? '#ff5252' : '';
+ stressEl.style.animation = state.stress >= 70 ? 'pulseStress .7s infinite alternate' : '';
+ const dayBtn = document.getElementById('mainBottomBtn');
+ if(state.phase === 'day') {
+   dayBtn.style.display = 'block';
+   dayBtn.textContent = state.day === 7 ? 'Enter Night (Final Boss!)' : 'Enter Night';
+   dayBtn.onclick = () => showModal('Enter Night?', 'End daytime and prepare defenses.', [
+     {title:'Confirm', primary:true, cb:()=>{closeModal(); enterNight();}},
+     {title:'Cancel', cb:closeModal}
+   ]);
+ } else {
+   dayBtn.style.display = 'none';
+ }
+ document.getElementById('dayPanel').classList.toggle('hidden',state.phase!=='day');
+ document.getElementById('deployPanel').classList.toggle('hidden',state.phase!=='deploy'&&state.phase!=='battle');
+ document.getElementById('battleControls').classList.toggle('hidden',state.phase!=='battle');
+ document.getElementById('startBattleBtn').classList.toggle('hidden', state.phase==='battle');
+ const wInfo=document.getElementById('waveInfoLeft');
+ if((state.phase==='deploy' || state.phase==='battle') && WAVES[state.wave-1]){
+   wInfo.innerHTML = `<b>Wave ${state.wave} Enemies:</b><br>` + WAVES[state.wave-1].list.map(([id,n])=>`<div class="wave-sidebar-item"><img src="${ENEMY_IMGS[id]}"><span>${ENEMIES[id].name} ×${n}</span></div>`).join('');
+ } else wInfo.innerHTML='';
+ const bInfo=document.getElementById('battleInfo');
+ if(state.phase==='battle'){
+   const eff = state.effStress, m = state.waveMultipliers;
+   bInfo.innerHTML = `<b>Effective Stress: ${eff}</b><br>HP: x${m.hp} | SPD: x${m.spd}<br>Gold Drop: x${m.gold} | Leak DMG: x${m.leak}`;
+ }
+ if(lists){
+   renderInventories();
+   renderBattleTactics();
+   const shopSec = document.getElementById('nightShopSection');
+   if(state.phase==='deploy'||state.phase==='battle') {
+     shopSec.classList.remove('hidden');
+     const nsGrid = document.getElementById('nightShopGrid');
+     nsGrid.innerHTML = '';
+     TOWERS.forEach(t=>{
+       const div=document.createElement('div');
+       div.className='item';
+       const disabled = state.gold<t.price?'disabled':'';
+       div.innerHTML=`<div class="head"><b>${t.name}</b>${badge(t.rarity)}</div><button class="primary" style="margin-top:6px;" ${disabled}>Buy (${t.price}G)</button>`;
+       div.querySelector('button').onclick=()=>{
+         if(state.gold<t.price) return showToast('Not enough gold.');
+         state.gold-=t.price;
+         addTowerToInventory(t.id);
+         beep(1200,.09,'triangle');
+         updateAllUI();
+         showPurchaseSuccess(t.name, t.price);
+       };
+       nsGrid.appendChild(div);
+     });
+   } else {
+     shopSec.classList.add('hidden');
+   }
+   const insp=document.getElementById('towerInspector');
+   const selT=state.placedTowers.find(x=>x.uid===state.selectedPlaced);
+   if(!selT) insp.innerHTML='Click a placed tower on the map.';
+   else {
+     const u=selT.def.up[selT.level];
+     const canUp = u && state.gold >= u[0];
+     insp.innerHTML=`<b>${selT.def.name}</b> +${selT.level}<br><div class="btns">${u?`<button class="primary" id="upBtn" ${canUp?'':'disabled'}>Upgrade (${u[0]} G)</button>`:''}<button class="danger ghost" id="sellBtn">Demolish</button></div>`;
+     if(u) document.getElementById('upBtn').onclick=()=>{ if(canUp){state.gold-=u[0];selT.level++;updateAllUI();} };
+     document.getElementById('sellBtn').onclick=()=>{ state.gold+=Math.round(selT.def.price*.5); state.placedTowers=state.placedTowers.filter(x=>x.uid!==selT.uid); state.selectedPlaced=null; updateAllUI(); };
+   }
+ }
+}
+
+document.getElementById('restartBtn').onclick=()=>showModal('Restart', 'Choose where to restart.', [
+  {title:'Restart Current Stage', primary:true, cb:()=>{closeModal(); restartCurrentStage();}},
+  {title:'Back To Day 1', cb:()=>{closeModal(); newGame();}},
+  {title:'Cancel', cb:closeModal}
+]);
+
+const stressAnimStyle = document.createElement('style');
+stressAnimStyle.textContent = `@keyframes pulseStress { from { transform: scale(1); } to { transform: scale(1.12); } }`;
+document.head.appendChild(stressAnimStyle);
+
+function draw(){
+ if(!state) return; ctx.clearRect(0,0,W,H);
+ const bgImg = getImg(state.phase==='day' ? ASSETS.day : ASSETS.night);
+ if(bgImg.complete) ctx.drawImage(bgImg,0,0,W,H);
+ if(state.phase!=='day'){
+   ctx.save();
+   for(const cell of towerCells){
+    const hasTower = state.placedTowers.some(t=>t.r===cell.r&&t.c===cell.c);
+    if(!hasTower){
+      ctx.strokeStyle=state.selectedTowerId?'rgba(125,223,242,.95)':'rgba(120,184,255,.4)';
+      ctx.lineWidth=2;
+      ctx.fillStyle='rgba(70,140,255,.16)';
+      roundRect(cell.c*C+5,cell.r*C+5,C-10,C-10,7,true,true);
+    } else {
+      ctx.strokeStyle='rgba(170,220,255,.55)';
+      ctx.lineWidth=2;
+      ctx.fillStyle='rgba(70,140,255,.05)';
+      roundRect(cell.c*C+5,cell.r*C+5,C-10,C-10,7,true,true);
+    }
+   }
+   ctx.restore();
+   const sel=state.placedTowers.find(x=>x.uid===state.selectedPlaced);
+   if(sel){
+    ctx.save(); ctx.fillStyle='rgba(125,223,242,.13)'; ctx.strokeStyle='rgba(125,223,242,.95)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(sel.x,sel.y,(sel.def.range||0)*C,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
+   }
+   for(const t of state.placedTowers){
+    ctx.save(); const img=getImg(TOWER_IMGS[t.def.id]);
+    if(img.complete) ctx.drawImage(img, t.x-32, t.y-32, 64, 64);
+    else { ctx.fillStyle='rgba(123,223,242,0.5)'; ctx.beginPath(); ctx.arc(t.x,t.y,16,0,Math.PI*2); ctx.fill(); }
+    if(t.level){ctx.fillStyle='#000';ctx.font='bold 14px sans-serif';ctx.fillText('+'+t.level,t.x+12,t.y-12);}
+    ctx.restore();
+   }
+
+   for (const e of state.enemies) {
+    ctx.save(); // 保存当前画布状态
+
+    // 修正：使用 e.type 才能正确匹配 ENEMY_IMGS 里的键名
+    const imgKey = e.type || 'thought'; 
+    const imgPath = ENEMY_IMGS[imgKey];
+    const img = getImg(imgPath);
+    const size = e.def.size === 'boss' ? 80 : e.def.size === 'large' ? 64 : 48;
+    if (img.complete) ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
+
+    imgKey
+    
+    const w=34,h=6, pct=clamp(e.hp/e.maxHp,0,1);
+    ctx.fillStyle='red'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w,h); ctx.fillStyle='#55e07a'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w*pct,h);
+    ctx.strokeStyle='black'; ctx.strokeRect(e.x-w/2,e.y-size/2-10,w,h); ctx.restore();
+   }
+   for(const p of state.projectiles){ ctx.save(); ctx.fillStyle='#ffc857';ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.restore(); }
+ } else {
+    ctx.save(); const pImg=getImg(playerSrc);
+    if(pImg.complete) ctx.drawImage(pImg, player.x-32, player.y-32, 64, 64);
+    ctx.restore();
+ }
+ for(const f of state.fx){
+  ctx.save();
+  if(f.kind==='coin'){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#ffc857';ctx.font='bold 20px sans-serif';ctx.fillText('+'+f.val,f.x,f.y-(1-f.life)*28);}
+  if(f.kind==='smoke'){ctx.globalAlpha=clamp(f.life/.4,0,1);ctx.fillStyle='rgba(210,240,255,.5)';ctx.beginPath();ctx.arc(f.x,f.y,25*(1-f.life/.4),0,Math.PI*2);ctx.fill();}
+  if(f.kind==='coreHit'){ctx.globalAlpha=clamp(f.life/.5,0,1);ctx.strokeStyle='rgba(255,80,80,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y,40*(1-f.life/.5),0,Math.PI*2);ctx.stroke();}
+  ctx.restore();
+ }
+}
+
+window.onload=newGame;
+</script>
+</body>
+</html>

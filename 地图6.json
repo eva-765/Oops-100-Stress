@@ -1,0 +1,2613 @@
+{
+  "version": "2.0",
+  "cols": 21,
+  "rows": 15,
+  "cellSize": 64,
+  "gridColor": "#222222",
+  "showGrid": true,
+  "snapLabel": true,
+  "layerOpacity": 0.69,
+  "transparentEmpty": true,
+  "background": {
+    "src": "",
+    "visible": true,
+    "opacity": 0.65,
+    "scaleX": 0.2098688319800125,
+    "scaleY": 0.22519352568613651,
+    "offsetX": 0,
+    "offsetY": 0,
+    "naturalWidth": 6404,
+    "naturalHeight": 4263,
+    "name": "bg1.png"
+  },
+  "types": [
+    {
+      "id": "empty",
+      "name": "空白",
+      "color": "#ffffff",
+      "label": ""
+    },
+    {
+      "id": "road",
+      "name": "道路",
+      "color": "#cfcfcf",
+      "label": ""
+    },
+    {
+      "id": "start",
+      "name": "入口 / 起点",
+      "color": "#f6c400",
+      "label": "S"
+    },
+    {
+      "id": "core",
+      "name": "核心 / 终点",
+      "color": "#f5dfcd",
+      "label": "C"
+    },
+    {
+      "id": "tower",
+      "name": "普通塔位",
+      "color": "#8fb5f4",
+      "label": "T"
+    },
+    {
+      "id": "工作区",
+      "name": "办公室",
+      "color": "#5de0ea",
+      "label": ""
+    },
+    {
+      "id": "放松区",
+      "name": "餐厅",
+      "color": "#ffa947",
+      "label": ""
+    },
+    {
+      "id": "商店",
+      "name": "商店",
+      "color": "#ffea00",
+      "label": ""
+    },
+    {
+      "id": "锻炼区",
+      "name": "图书馆",
+      "color": "#5842ff",
+      "label": ""
+    },
+    {
+      "id": "锻炼区_1",
+      "name": "宿舍",
+      "color": "#e390f4",
+      "label": ""
+    },
+    {
+      "id": "背景",
+      "name": "背景",
+      "color": "#f5dfcd",
+      "label": ""
+    }
+  ],
+  "cells": [
+    {
+      "r": 0,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 4,
+      "type": "start",
+      "color": "#f6c400",
+      "label": "S",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 5,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 6,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 7,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 9,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 10,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 11,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 12,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 13,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 14,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 0,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 5,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 6,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 7,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 9,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 10,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 11,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 12,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 13,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 14,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 1,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 5,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 6,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 7,
+      "type": "放松区",
+      "color": "#ffa947",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 8,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 9,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 10,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 11,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 12,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 13,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 14,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 2,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 5,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 6,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 7,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 8,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 9,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 13,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 14,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 3,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 3,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 5,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 6,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 7,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 8,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 9,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 10,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 11,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 12,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 13,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 14,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 15,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 17,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 18,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 19,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 4,
+      "c": 20,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 3,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 4,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 5,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 6,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 7,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 9,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 13,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 14,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 15,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 17,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 18,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 5,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 3,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 4,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 5,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 6,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 7,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 9,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 13,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 14,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 15,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 17,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 18,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 6,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 3,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 5,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 6,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 7,
+      "type": "工作区",
+      "color": "#5de0ea",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 9,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 10,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 11,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 12,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 13,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 14,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 15,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 17,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 7,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 5,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 6,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 7,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 8,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 9,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 10,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 11,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 12,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 13,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 14,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 15,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 17,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 8,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 2,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 3,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 4,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 5,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 6,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 7,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 8,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 9,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 10,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 11,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 12,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 13,
+      "type": "锻炼区",
+      "color": "#5842ff",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 14,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 15,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 17,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 9,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 3,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 4,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 5,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 6,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 7,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 8,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 9,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 13,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 14,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 15,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 16,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 17,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 10,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 3,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 4,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 5,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 6,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 7,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 8,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 9,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 13,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 14,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 15,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 16,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 17,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 11,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 3,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 4,
+      "type": "商店",
+      "color": "#ffea00",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 5,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 6,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 7,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 8,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 9,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 10,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 11,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 13,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 14,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 15,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 16,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 17,
+      "type": "锻炼区_1",
+      "color": "#e390f4",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 12,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 3,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 4,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 5,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 6,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 7,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 8,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 9,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 10,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 11,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 12,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 13,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 14,
+      "type": "road",
+      "color": "#cfcfcf",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 13,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 0,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 1,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 2,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 3,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 4,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 5,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 6,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 7,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 8,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 9,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 10,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 11,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 12,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 13,
+      "type": "tower",
+      "color": "#8fb5f4",
+      "label": "T",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 14,
+      "type": "core",
+      "color": "#f5dfcd",
+      "label": "C",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 15,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 16,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 17,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 18,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 19,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    },
+    {
+      "r": 14,
+      "c": 20,
+      "type": "背景",
+      "color": "#f5dfcd",
+      "label": "",
+      "note": ""
+    }
+  ]
+}
