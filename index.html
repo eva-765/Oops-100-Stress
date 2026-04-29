@@ -499,20 +499,32 @@ function calcWaveMultipliers(effectiveStress) {
   return { hp: 2.0, spd: 1.8, leak: 1.5, gold: 2.0 };
 }
 
-// REMOVED: Duplicate addStress function - using the version that calls triggerHighStressWarning() at line 1246 instead
-
 // ========== V4 塔防与物品数据（英文） ==========
 const TOWERS = [
- {id:'focus_note',name:'Focus Note Tower',rarity:'basic',price:35,stress:12,atk:7,rate:2.0,range:3.0,aoe:0,desc:'Stable & fast single target attack.',up:[[20,'ATK +2'],[35,'SPD +15%'],[50,'Bonus DMG on 4th hit']]},
- {id:'tomato_clock',name:'Tomato Clock Tower',rarity:'rare',price:75,stress:22,atk:9,rate:2.0,range:3.2,aoe:0,desc:'Dash status after 10s attacking.',up:[[40,'ATK +3'],[65,'Dash lasts 5s'],[90,'Prioritize fast enemies']]},
- {id:'flow_prism',name:'Flow Prism Tower',rarity:'legendary',price:125,stress:35,atk:10,rate:2.1,range:3.4,aoe:0,desc:'DMG scales on same target.',up:[[65,'Max 6 stacks'],[100,'Range +0.4'],[140,'Transfers half stack on kill']]},
- {id:'plan_cannon',name:'Plan Cannon',rarity:'basic',price:50,stress:12,atk:26,rate:.65,range:4.4,aoe:0,desc:'Ignores 8 armor.',up:[[25,'ATK +7'],[45,'Ignore 12 armor'],[65,'+20% DMG vs Heavy']]},
- {id:'milestone_cannon',name:'Milestone Cannon',rarity:'rare',price:85,stress:22,atk:32,rate:.62,range:4.6,aoe:0,desc:'Marks enemy with vulnerability.',up:[[45,'ATK +7'],[75,'Mark time +2s'],[105,'Gold on marked kill']]},
- {id:'checklist_mortar',name:'Checklist Mortar',rarity:'basic',price:50,stress:12,atk:20,rate:.70,range:4.2,aoe:1.0,desc:'Standard AoE explosion.',up:[[25,'ATK +5'],[45,'AoE +0.2'],[65,'Burn effect']]},
- {id:'calm_spray',name:'Calm Spray Tower',rarity:'basic',price:40,stress:12,atk:4,rate:1.2,range:3.4,aoe:0,desc:'Slows enemy by 25%.',up:[[20,'Slow to 32%'],[35,'Duration +0.4s'],[55,'Vuln. on slow']]},
- {id:'breath_beat',name:'Breath Beat Tower',rarity:'rare',price:80,stress:22,atk:3,rate:1.0,range:3.5,aoe:1.0,desc:'AoE slowing pulse.',up:[[40,'AoE +0.2'],[65,'Slow to 38%'],[90,'Stun every 3rd pulse']]},
- {id:'arc_link',name:'Arc Link Tower',rarity:'basic',price:55,stress:12,atk:11,rate:1.0,range:3.2,aoe:0,desc:'Attacks chain to nearby enemies.',up:[[30,'ATK +3'],[50,'Chain +1 target'],[70,'Stun on 5th hit']]},
- {id:'rest_lighthouse',name:'Rest Lighthouse',rarity:'basic',price:35,stress:12,atk:2,rate:.8,range:2.8,aoe:0.8,desc:'Stress -3 after wave ends.',special:'recover3',up:[[20,'Extra -1 Stress'],[35,'AoE +0.2'],[50,'-2 Stress if flawless']]}
+ {id:'focus_note',name:'Focus Note Tower',rarity:'basic',price:35,stress:12,atk:7,rate:2.0,range:3.0,aoe:0,desc:'Stable & fast single target attack.',up:[[20,'ATK +2, SPD +0.5'],[35,'SPD +1.5'],[50,'SPD +1, RNG +1']]},
+ {id:'tomato_clock',name:'Tomato Clock Tower',rarity:'rare',price:75,stress:22,atk:9,rate:4.0,range:4.0,aoe:0,desc:'Dash status after 5s attacking.',up:[[40,'ATK +3'],[65,'Dash SPD +5'],[90,'ATK +3, SPD +2']]},
+ {id:'flow_prism',name:'Flow Prism Tower',rarity:'legendary',price:125,stress:35,atk:10,rate:8.0,range:3.4,aoe:0,desc:'DMG scales on same target.',up:[[65,'Max 10 stacks'],[100,'RNG +1, SPD +2'],[140,'AOE +0.8']]},
+ {id:'plan_cannon',name:'Plan Cannon',rarity:'basic',price:50,stress:12,atk:26,rate:.65,range:4.4,aoe:0,desc:'Ignores 1 armor.',up:[[25,'ATK +10'],[45,'SPD +0.5'],[65,'ATK +50']]},
+ {id:'milestone_cannon',name:'Milestone Cannon',rarity:'rare',price:85,stress:22,atk:32,rate:.62,range:4.6,aoe:0,desc:'Marks enemy with vulnerability.',up:[[45,'ATK +10'],[75,'SPD +1, RNG +1'],[105,'Mark Vuln. 30%']]},
+ {id:'matrix_breaker',name:'Matrix Breaker',rarity:'legendary',price:140,stress:35,atk:50,rate:.78,range:4.8,aoe:0,desc:'Reduces enemy armor by 2.',up:[[75,'ATK +10'],[115,'ATK +40'],[160,'AOE +0.8']]},
+ {id:'checklist_mortar',name:'Checklist Mortar',rarity:'basic',price:50,stress:12,atk:20,rate:.70,range:4.2,aoe:1.0,desc:'Standard AoE explosion.',up:[[25,'ATK +10'],[45,'AOE +0.5'],[65,'ATK +30']]},
+ {id:'multithread_list',name:'Multithread List',rarity:'rare',price:90,stress:22,atk:18,rate:2.0,range:4.0,aoe:0.8,desc:'Standard AoE explosion.',up:[[45,'SPD +1.5'],[75,'Extra shot, ATK -3'],[105,'Extra 2 shots, ATK -4']]},
+ {id:'archive_storm',name:'Archive Storm',rarity:'legendary',price:145,stress:35,atk:100,rate:.65,range:4.5,aoe:2.0,desc:'Standard AoE explosion.',up:[[75,'ATK +50'],[120,'RNG +3'],[165,'AOE +0.5']]},
+ {id:'calm_spray',name:'Calm Spray Tower',rarity:'basic',price:40,stress:12,atk:4,rate:1.2,range:3.4,aoe:0,desc:'Slows enemy by 25%.',up:[[20,'Slow to 50%'],[35,'Duration +0.5s'],[55,'SPD +1, RNG +3']]},
+ {id:'breath_beat',name:'Breath Beat Tower',rarity:'rare',price:80,stress:22,atk:3,rate:1.0,range:3.5,aoe:1.0,desc:'AoE slowing pulse.',up:[[40,'AOE +0.5'],[65,'Slow to 50%'],[90,'Stun every 3rd pulse']]},
+ {id:'time_anchor',name:'Time Anchor Tower',rarity:'legendary',price:135,stress:35,atk:5,rate:0.8,range:3.7,aoe:0.8,desc:'Freeze enemies periodically.',up:[[70,'Freeze +0.2s'],[110,'Freeze +0.2s'],[150,'SPD +0.2']]},
+ {id:'arc_link',name:'Arc Link Tower',rarity:'basic',price:55,stress:12,atk:10,rate:1.0,range:3.2,aoe:0,desc:'Attacks chain to nearby enemies.',up:[[30,'ATK +4'],[50,'Chain +1 target'],[70,'SPD +1']]},
+ {id:'support_hotline',name:'Support Hotline',rarity:'rare',price:90,stress:22,atk:8,rate:1.1,range:3.3,aoe:0,desc:'Boost nearby tower SPD.',up:[[50,'SPD +2'],[80,'Boost RNG +1'],[110,'Boost SPD +50%']]},
+ {id:'resonance_net',name:'Resonance Net',rarity:'legendary',price:150,stress:35,atk:13,rate:3.0,range:3.4,aoe:0,desc:'Boost DMG per active buff.',up:[[80,'ATK +10'],[125,'Buff DMG +100%'],[175,'Buff DMG +150%']]},
+ {id:'boundary_sentry',name:'Boundary Sentry',rarity:'basic',price:40,stress:12,atk:12,rate:1.3,range:3.0,aoe:0,desc:'Bonus DMG late on path.',up:[[20,'SPD +0.7'],[35,'Bonus DMG +80%'],[55,'AOE +0.8']]},
+ {id:'reject_threshold',name:'Reject Threshold',rarity:'rare',price:80,stress:22,atk:7,rate:1.2,range:3.1,aoe:0,desc:'Knockback enemies.',up:[[40,'Knockback interval 5s'],[65,'Knockback dist. UP'],[90,'Vuln. on knockback']]},
+ {id:'safe_boundary',name:'Safe Boundary',rarity:'legendary',price:130,stress:35,atk:5,rate:1.0,range:3.2,aoe:0.5,desc:'Reduce stress start of wave.',up:[[70,'Bonus Stress -20'],[110,'Bonus Stress -20'],[150,'Bonus Stress -20']]},
+ {id:'review_mark',name:'Review Mark Tower',rarity:'basic',price:45,stress:12,atk:4,rate:1.0,range:3.8,aoe:0,desc:'Mark enemies for extra DMG.',up:[[25,'+1 Gold on kill'],[40,'Mark duration +1s'],[60,'Mark DMG to 100%']]},
+ {id:'mistake_book',name:'Mistake Book',rarity:'rare',price:85,stress:22,atk:5,rate:1.1,range:4.0,aoe:0,desc:'Bonus % HP DMG.',up:[[45,'Bonus DMG to 10%'],[70,'Bonus DMG to 15%'],[100,'Max Bonus DMG 200']]},
+ {id:'insight_reader',name:'Insight Reader',rarity:'legendary',price:140,stress:35,atk:4,rate:0.9,range:4.5,aoe:0.8,desc:'Detect stealth, mark enemies.',up:[[75,'Mark DMG to 100%'],[115,'AOE +0.4'],[160,'RNG +2, AOE +0.4']]},
+ {id:'rest_lighthouse',name:'Rest Lighthouse',rarity:'basic',price:35,stress:12,atk:2,rate:.8,range:2.8,aoe:0.8,desc:'Stress -3 after wave ends.',special:'recover3',up:[[20,'Extra -1 Stress'],[35,'AOE +0.2'],[50,'-2 Stress if flawless']]},
+ {id:'sleep_pod',name:'Sleep Pod',rarity:'rare',price:80,stress:22,atk:1,rate:0.7,range:3.0,aoe:1.0,desc:'Gain Knowledge at wave start.',up:[[40,'Knowledge +10'],[65,'Knowledge +10'],[90,'Knowledge +10']]},
+ {id:'safe_house',name:'Safe House',rarity:'legendary',price:135,stress:35,atk:3,rate:0.6,range:3.2,aoe:1.2,desc:'Gain AP next day.',up:[[70,'Gold +20'],[110,'Gold +20'],[150,'AP +1']]}
 ];
 const towerById = Object.fromEntries(TOWERS.map(t=>[t.id,t]));
 
@@ -571,26 +583,26 @@ const NIGHT_SHOP_CATALOG = [
 ];
 
 const ENEMIES={
- thought:{name:'Thought',hp:32,speed:.70,armor:0,damage:1,size:'small', baseLeak:3, baseGold:3},
- urgency:{name:'Urgency',hp:30,speed:1.16,armor:0,damage:1,size:'small', baseLeak:4, baseGold:4},
- shell:{name:'Shell',hp:115,speed:.49,armor:12,damage:2,size:'large', baseLeak:8, baseGold:9},
- repeat:{name:'Repeat',hp:70,speed:.63,armor:0,damage:1,size:'mid', baseLeak:6, baseGold:7, special:'split'},
- smallThought:{name:'Small Thought',hp:20,speed:.84,armor:0,damage:1,size:'small', baseLeak:2, baseGold:2},
- rational:{name:'Rationalization',hp:90,speed:.56,armor:0,damage:2,size:'mid', baseLeak:8, baseGold:10},
- noise:{name:'Noise',hp:80,speed:.60,armor:0,damage:2,size:'mid', baseLeak:9, baseGold:11},
- avoid:{name:'Avoidance',hp:60,speed:.81,armor:0,damage:1,size:'small', baseLeak:6, baseGold:8},
- numb:{name:'Numbness',hp:200,speed:.39,armor:5,damage:3,size:'large', baseLeak:12, baseGold:16},
- deadline:{name:'Deadline Boss',hp:2000,speed:.32,armor:15,damage:5,size:'boss', baseLeak:100, baseGold:0, special:'boss'}
+ thought:{name:'Thought',hp:64,speed:.70,armor:0,damage:1,size:'small', baseLeak:3, baseGold:5},
+ urgency:{name:'Urgency',hp:64,speed:1.16,armor:0,damage:1,size:'small', baseLeak:4, baseGold:6},
+ shell:{name:'Shell',hp:230,speed:.49,armor:2,damage:2,size:'large', baseLeak:8, baseGold:12},
+ repeat:{name:'Repeat',hp:140,speed:.63,armor:0,damage:1,size:'mid', baseLeak:6, baseGold:7, special:'split'},
+ smallThought:{name:'Small Thought',hp:40,speed:.84,armor:0,damage:1,size:'small', baseLeak:2, baseGold:2},
+ rational:{name:'Rationalization',hp:180,speed:.56,armor:0,damage:2,size:'mid', baseLeak:8, baseGold:12},
+ noise:{name:'Noise',hp:160,speed:.60,armor:0,damage:2,size:'mid', baseLeak:9, baseGold:14},
+ avoid:{name:'Avoidance',hp:120,speed:.81,armor:0,damage:1,size:'small', baseLeak:6, baseGold:12},
+ numb:{name:'Numbness',hp:400,speed:.39,armor:1,damage:3,size:'large', baseLeak:12, baseGold:20},
+ deadline:{name:'Deadline Boss',hp:8000,speed:.32,armor:3,damage:5,size:'boss', baseLeak:100, baseGold:0, special:'boss'}
 };
 
 const WAVES=[
- {list:[['thought',8]], interval:1.1}, // Mon
- {list:[['thought',8],['urgency',4]], interval:1.0}, // Tue
- {list:[['thought',8],['shell',3]], interval:1.2}, // Wed
- {list:[['thought',8],['repeat',5]], interval:1.0}, // Thu
- {list:[['thought',8],['urgency',6],['rational',3]], interval:.9}, // Fri
- {list:[['thought',6],['shell',5],['noise',3],['avoid',3]], interval:.9}, // Sat
- {list:[['deadline',1],['thought',10],['urgency',6],['shell',3],['rational',2],['noise',2],['avoid',3]], interval:.8} // Sun
+ {list:[['thought',30]], interval:1.1}, // Mon
+ {list:[['thought',40],['urgency',8]], interval:1.0}, // Tue
+ {list:[['thought',60],['shell',12]], interval:1.2}, // Wed
+ {list:[['thought',60],['repeat',30]], interval:1.0}, // Thu
+ {list:[['thought',20],['urgency',32],['rational',8],['noise',10],['avoid',6]], interval:.9}, // Fri
+ {list:[['shell',20],['repeat',20],['noise',6],['numb',10]], interval:.9}, // Sat
+ {list:[['deadline',1],['thought',10],['urgency',12],['shell',8],['rational',4],['noise',4],['avoid',6],['numb',5]], interval:.8} // Sun
 ];
 
 let state;
@@ -794,10 +806,6 @@ function doAction(apCost, effect, id){
  });
 }
 
-
-
-// REMOVED: Duplicate openBuffTacticShop function - using the version at line 1212 instead
-
 window.buyShopItem = function(kind, id) {
     let d = kind==='buff' ? buffById[id] : tacticById[id];
     if(state.gold >= d.price) {
@@ -808,8 +816,6 @@ window.buyShopItem = function(kind, id) {
         openBuffTacticShop(); // Refresh UI to update disabled buttons
     }
 }
-
-// REMOVED: Duplicate enterNight function - using the newer version at line 1392 instead
 
 function startBattle(){
  if(state.phase!=='deploy') return;
@@ -838,10 +844,6 @@ function spawnEnemy(id){
  const hp=Math.max(1, Math.round(def.hp * state.waveMultipliers.hp));
  state.enemies.push({id:Math.random().toString(36).slice(2),type:id,def,hp,maxHp:hp,x:path[0].x,y:path[0].y,path,pi:1,progress:0,slow:0,slowMul:1,stun:0,hitTimer:0});
 }
-
-// REMOVED: Duplicate showRewardModal function - using the version that calls sampleRewardItem() at line 1254
-
-// REMOVED: Duplicate endWave function - using the newer version at line 1402 instead
 
 function updateCombat(dt){
  const logicDt=dt*state.timeScale; state.combatTime+=logicDt;
@@ -942,12 +944,8 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 
-
-// REMOVED: Duplicate draw function - using the version at line 1351 instead
-
 function roundRect(x,y,w,h,r,fill,stroke){ ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath(); if(fill)ctx.fill(); if(stroke)ctx.stroke(); }
 
-// REMOVED: Duplicate updateAllUI function - using the newer version at line 1413 instead
 function setTab(name){
  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
  document.querySelectorAll('.tabPane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+name));
@@ -1352,8 +1350,6 @@ function draw(){
     const img = getImg(imgPath);
     const size = e.def.size === 'boss' ? 80 : e.def.size === 'large' ? 64 : 48;
     if (img.complete) ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
-
-    imgKey
     
     const w=34,h=6, pct=clamp(e.hp/e.maxHp,0,1);
     ctx.fillStyle='red'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w,h); ctx.fillStyle='#55e07a'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w*pct,h);
