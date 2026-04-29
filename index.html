@@ -162,7 +162,27 @@ canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 2
 </head>
 <body>
 
-<div id="genderModal" class="modal" style="z-index: 100;">
+<div id="difficultyModal" class="modal" style="z-index: 120;">
+  <div class="modalCard" style="text-align:center; display:flex; flex-direction:column; justify-content:center; background: url('UIII/background.png') center/cover no-repeat #000;">
+    <h1 style="color:#ffc857; text-shadow: 2px 2px 4px #000; margin-bottom: 18px;">Welcome to 'Oops, 100 Stress'</h1>
+    <h2 style="color:#fff; margin-bottom: 12px; text-shadow: 1px 1px 3px #000;">Choose Difficulty</h2>
+    <p style="color:#fff; max-width:680px; margin:0 auto 26px; text-shadow:1px 1px 3px #000;">Difficulty changes the HP multiplier for non-Thought enemies. Easy is recommended for first-time play.</p>
+    <div class="choiceGrid" style="display:flex; justify-content:center; flex-wrap:wrap; gap:24px;">
+      <div onclick="selectDifficulty('easy')" style="cursor:pointer; text-align:center; padding:18px; background:rgba(0,0,0,0.65); border:2px solid #ffc857; border-radius:16px; width:260px;">
+        <h2 style="color:#ffc857; margin:0 0 10px;">Easy Mode</h2>
+        <p style="color:#fff; font-size:13px; line-height:1.45; margin-bottom:14px;">Lower HP scaling for non-Thought enemies.<br>Best for learning the systems.</p>
+        <button class="primary" style="width:100%;">Select Easy</button>
+      </div>
+      <div onclick="selectDifficulty('hard')" style="cursor:pointer; text-align:center; padding:18px; background:rgba(0,0,0,0.65); border:2px solid #fb7185; border-radius:16px; width:260px;">
+        <h2 style="color:#fb7185; margin:0 0 10px;">Hard Mode</h2>
+        <p style="color:#fff; font-size:13px; line-height:1.45; margin-bottom:14px;">Uses the original high HP scaling table.<br>For stronger tower-defense pressure.</p>
+        <button class="primary" style="width:100%;">Select Hard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="genderModal" class="modal hidden" style="z-index: 100;">
   <div class="modalCard" style="text-align:center; display:flex; flex-direction:column; justify-content:center; background: url('UIII/background.png') center/cover no-repeat #000;">
     <h1 style="color:#ffc857; text-shadow: 2px 2px 4px #000; margin-bottom: 30px;">Welcome to 'Oops, 100 Stress'</h1>
     <h2 style="color:#fff; margin-bottom: 20px; text-shadow: 1px 1px 3px #000;">Select Your Character</h2>
@@ -423,6 +443,20 @@ const SHOP_ITEM_PATHS = {
   pl1: '道具/bufficon.png'
 };
 
+let selectedDifficulty = 'easy';
+function selectDifficulty(mode){
+    selectedDifficulty = mode === 'hard' ? 'hard' : 'easy';
+    if(state){
+        state.difficulty = selectedDifficulty;
+        state.daySnapshot = createSnapshot();
+    }
+    const diffModal = document.getElementById('difficultyModal');
+    const genderModal = document.getElementById('genderModal');
+    if(diffModal) diffModal.classList.add('hidden');
+    if(genderModal) genderModal.classList.remove('hidden');
+    unlockAudio();
+}
+
 let playerSrc = 'character/Female1.png';
 let playerName = 'Girl A';
 function selectGender(g) {
@@ -586,7 +620,8 @@ function renderWaveRouteInfo(){
   const plan = ensureWaveRoutePlan(state.phase === 'battle' ? state.currentWaveEventMods : state.nextWaveMods);
   if(!plan?.groups?.length) return '<span>No route preview available.</span>';
   const selected = state.selectedRouteIndex;
-  return `<b>Wave ${state.wave} Enemies by Route:</b><br>` + plan.groups.map((g,i)=>{
+  const diff = getCurrentDifficultySetting();
+  return `<b>Wave ${state.wave} Enemies by Route:</b><br><span style="font-size:11px;color:#6b7280;">${diff.label} · Thought HP x${getWaveEnemyHpMultiplier('thought', state.wave)} · Other HP x${getWaveEnemyHpMultiplier('urgency', state.wave)}</span><br>` + plan.groups.map((g,i)=>{
     const chips = Object.entries(g.counts).map(([id,n])=>`<span class="route-enemy-chip"><img src="${ENEMY_IMGS[id]}"><span>${ENEMIES[id]?.name || id} ×${n}</span></span>`).join('');
     const label = selected === i ? 'shown on map' : 'click to preview';
     return `<div class="route-group ${selected===i?'selected':''}" onclick="selectWaveRoute(${i})"><div class="route-title"><span>${g.name}</span><span>${label}</span></div><div class="route-enemies">${chips}</div></div>`;
@@ -1136,12 +1171,36 @@ const WAVES=[
  {list:[['deadline',1],['thought',10],['urgency',12],['shell',8],['rational',4],['noise',4],['avoid',6],['numb',5]], interval:.8} // Sun
 ];
 
+const DIFFICULTY_SETTINGS = {
+ easy: {
+   label: 'Easy Mode',
+   thoughtHpMul: [.8, 1, 1, 1, 1, 1, 1],
+   otherHpMul:   [1, 1, 1.2, 1.3, 1.5, 1.5, 2]
+ },
+ hard: {
+   label: 'Hard Mode',
+   thoughtHpMul: [.8, 1, 1, 1, 1, 1, 1],
+   otherHpMul:   [1, 2, 2, 3, 4, 5, 6]
+ }
+};
+function getCurrentDifficultySetting(){
+ const key = state?.difficulty || selectedDifficulty || 'easy';
+ return DIFFICULTY_SETTINGS[key] || DIFFICULTY_SETTINGS.easy;
+}
+function getWaveEnemyHpMultiplier(enemyId, waveNumber=state?.wave || 1){
+ const idx = Math.max(0, Math.min(6, waveNumber - 1));
+ const setting = getCurrentDifficultySetting();
+ if(enemyId === 'thought') return setting.thoughtHpMul[idx] ?? 1;
+ return setting.otherHpMul[idx] ?? 1;
+}
+
 let state;
 
 // 状态快照保存，用于失败时重试
 function createSnapshot() {
     return {
         day: state.day, phase: state.phase, wave: state.wave, stress: state.stress,
+        difficulty: state.difficulty || selectedDifficulty || 'easy',
         gold: state.gold, ap: state.ap, knowledge: state.knowledge || 0, work: state.work || 0, workLv: state.workLv, knowledgeLv: state.knowledgeLv,
         restaurantLv: state.restaurantLv,
         towerInventory: {...state.towerInventory}, buffInventory: {...state.buffInventory},
@@ -1159,6 +1218,7 @@ function createSnapshot() {
 function loadSnapshot(snap) {
     if(!snap) return newGame();
     state.day = snap.day; state.phase = snap.phase; state.wave = snap.wave; state.stress = snap.stress;
+    state.difficulty = snap.difficulty || selectedDifficulty || 'easy'; selectedDifficulty = state.difficulty;
     state.gold = snap.gold; state.ap = snap.ap; state.knowledge = snap.knowledge || 0; state.work = snap.work || 0; state.workLv = snap.workLv || 1; state.knowledgeLv = snap.knowledgeLv || 1;
     state.restaurantLv = snap.restaurantLv;
     state.towerInventory = {...snap.towerInventory}; state.buffInventory = {...snap.buffInventory};
@@ -1180,6 +1240,7 @@ function loadSnapshot(snap) {
 function newGame(){
  state={
   day: 1, phase:'day', wave:1, stress:0, tempStressReduction:0, gold:100, ap:3,
+  difficulty: selectedDifficulty || 'easy',
   knowledge:0, knowledgeLv:1, work:0, workLv:1, restaurantLv:1,
   towerInventory:{}, buffInventory:{}, tacticInventory:{}, 
   activeBuffIds:[], equippedTactics:[], tacticSlots:1, buffSlots:1,
@@ -1614,7 +1675,8 @@ function startBattle(){
 function makeEnemy(id, opts={}){
  const def=ENEMIES[id];
  if(!def) return null;
- const hp=Math.max(1, Math.round(def.hp * state.waveMultipliers.hp));
+ const waveEnemyHpMul = getWaveEnemyHpMultiplier(id);
+ const hp=Math.max(1, Math.round(def.hp * waveEnemyHpMul * state.waveMultipliers.hp));
  const path = opts.path;
  const pi = opts.pi ?? 1;
  const startX = opts.x ?? path?.[0]?.x;
@@ -2255,7 +2317,8 @@ function updateAllUI(lists=true){
  const bInfo=document.getElementById('battleInfo');
  if(state.phase==='battle'){
    const eff = state.effStress, m = state.waveMultipliers;
-   bInfo.innerHTML = `<b>Effective Stress: ${eff}</b><br>HP: x${m.hp} | SPD: x${m.spd}<br>Gold Drop: x${m.gold} | Leak DMG: x${m.leak}`;
+   const diff = getCurrentDifficultySetting();
+   bInfo.innerHTML = `<b>Effective Stress: ${eff}</b><br>${diff.label}: Thought HP x${getWaveEnemyHpMultiplier('thought', state.wave)} | Other HP x${getWaveEnemyHpMultiplier('urgency', state.wave)}<br>Stress HP: x${m.hp} | SPD: x${m.spd}<br>Gold Drop: x${m.gold} | Leak DMG: x${m.leak}`;
  }
  if(lists){
    renderInventories();
