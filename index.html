@@ -92,6 +92,14 @@ button.leave-btn { background: #fff !important; color: #000 !important; border: 
 
 .row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.grid2 button{width:100%}
+.char-status{display:flex;gap:10px;align-items:center;}
+.char-avatar{width:46px;height:46px;object-fit:contain;background:rgba(0,0,0,0.05);border-radius:10px;padding:3px;flex-shrink:0;}
+.level-row{display:flex;justify-content:space-between;align-items:center;background:rgba(255,200,87,0.16);border:1px solid rgba(0,0,0,0.06);border-radius:8px;padding:6px 8px;margin-top:6px;font-size:12px;}
+.level-row b{font-size:15px;color:#d97706;}
+.exp-row{margin-top:4px;padding:5px 7px;border-radius:8px;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.05);}
+.exp-label{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#6b7280;margin-bottom:3px;}
+.exp-bar{height:5px;border-radius:999px;background:rgba(0,0,0,0.10);overflow:hidden;}
+.exp-fill{height:100%;width:0%;border-radius:999px;background:#d97706;}
 
 .canvasBox{position:relative;min-width:0;min-height:0;background:transparent;overflow:hidden; display:flex; justify-content:center; align-items:center;}
 canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 25px rgba(0,0,0,0.6);}
@@ -140,6 +148,14 @@ canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 2
 /* 左侧波次详情面板 */
 .wave-sidebar-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 6px; }
 .wave-sidebar-item img { width: 30px; height: 30px; object-fit: contain; }
+.route-group { cursor:pointer; border:1px solid rgba(217,119,6,.25); background:rgba(255,255,255,.75); border-radius:10px; padding:7px 8px; margin:7px 0; transition:.12s transform,.12s background,.12s border-color; }
+.route-group:hover { transform:translateY(-1px); background:rgba(255,248,220,.95); border-color:rgba(217,119,6,.5); }
+.route-group.selected { background:rgba(255,200,87,.38); border-color:#d97706; box-shadow:0 0 0 2px rgba(255,200,87,.35) inset; }
+.route-title { display:flex; align-items:center; justify-content:space-between; gap:6px; font-weight:900; font-size:12px; margin-bottom:5px; }
+.route-title span { font-size:10px; color:#6b7280; font-weight:700; }
+.route-enemies { display:flex; flex-wrap:wrap; gap:4px; }
+.route-enemy-chip { display:flex; align-items:center; gap:3px; background:rgba(0,0,0,.045); border-radius:999px; padding:2px 6px; font-size:10px; font-weight:800; }
+.route-enemy-chip img { width:20px; height:20px; object-fit:contain; }
 
 @media(max-width:1180px){body{overflow:auto}.main{grid-template-columns:1fr}.side,.right{border:0}.canvasBox{order:-1}.topbar{height:auto;align-items:flex-start;gap:10px}}
 </style>
@@ -184,6 +200,29 @@ canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 2
   
   <main class="main">
     <aside class="side">
+      <section id="characterPanel" class="card">
+        <h3 style="margin:0 0 8px; font-size:15px;">Character Status</h3>
+        <div class="char-status">
+          <img id="sideCharacterImg" class="char-avatar" src="character/Female1.png" alt="Character" onerror="this.style.display='none';">
+          <div style="flex:1;min-width:0;">
+            <div class="small" style="font-weight:800;color:#d97706;" id="sideCharacterName">Girl A</div>
+            <div class="level-row"><span>📚 Knowledge Lv</span><b id="sideKnowledgeLv">1</b></div>
+            <div class="exp-row">
+              <div class="exp-label"><span>Knowledge EXP</span><span id="sideKnowledgeExpText">0 / 20</span></div>
+              <div class="exp-bar"><div id="sideKnowledgeExpFill" class="exp-fill"></div></div>
+              <div class="small" id="sideKnowledgeRemain" style="font-size:10px;margin-top:2px;color:#6b7280;">Next Lv: 20 left</div>
+            </div>
+            <div class="level-row"><span>💼 Work Lv</span><b id="sideWorkLv">1</b></div>
+            <div class="exp-row">
+              <div class="exp-label"><span>Work EXP</span><span id="sideWorkExpText">0 / 30</span></div>
+              <div class="exp-bar"><div id="sideWorkExpFill" class="exp-fill"></div></div>
+              <div class="small" id="sideWorkRemain" style="font-size:10px;margin-top:2px;color:#6b7280;">Next Lv: 30 left</div>
+            </div>
+            <div class="level-row"><span>🍜 Restaurant Lv</span><b id="sideRestaurantLv">1</b></div>
+          </div>
+        </div>
+      </section>
+
       <section id="dayPanel" class="card">
         <h3 style="margin:0 0 8px; font-size:15px;">Daytime Action</h3>
         <p class="small">Use WASD or Arrow Keys to move. Press Space near buildings.<br><b style="color:#d97706">Manage Stress! 100 Stress = Game Over!</b><br>Shop is closed during day.</p>
@@ -374,16 +413,25 @@ const SHOP_ITEM_PATHS = {
   tl1: '道具/全局暂停.png',
   tb1: '道具/速溶咖啡.png',
   anchor: '道具/稳定锚点.png',
-  tb2: '道具/应急零食.png'
+  tb2: '道具/应急零食.png',
+  // Buff 图标
+  ob1: '道具/bufficon.png',
+  ob2: '道具/bufficon.png',
+  ol5: '道具/bufficon.png',
+  pb1: '道具/bufficon.png',
+  pb2: '道具/bufficon.png',
+  pl1: '道具/bufficon.png'
 };
 
 let playerSrc = 'character/Female1.png';
+let playerName = 'Girl A';
 function selectGender(g) {
-    if(g === 'F1') playerSrc = 'character/Female1.png';
-    else if(g === 'F2') playerSrc = 'character/Female2.png';
-    else if(g === 'M1') playerSrc = 'character/Male1.png';
-    else if(g === 'M2') playerSrc = 'character/Male2.png';
+    if(g === 'F1') { playerSrc = 'character/Female1.png'; playerName = 'Girl A'; }
+    else if(g === 'F2') { playerSrc = 'character/Female2.png'; playerName = 'Girl B'; }
+    else if(g === 'M1') { playerSrc = 'character/Male1.png'; playerName = 'Boy A'; }
+    else if(g === 'M2') { playerSrc = 'character/Male2.png'; playerName = 'Boy B'; }
     getImg(playerSrc);
+    updateCharacterStatusPanel();
     document.getElementById('genderModal').classList.add('hidden');
     unlockAudio();
 }
@@ -458,7 +506,6 @@ function findPath(start){
     visited.add(curKey);
     if(cellMap[cur.r][cur.c] === 'core') return true;
     let options = neighbors(cur.r, cur.c).filter(nb => !visited.has(cellKey(nb.r, nb.c)));
-    if(Math.random() < 0.5) options.sort((a,b)=>(b.c-a.c) || (a.r-b.r));
     for(const nb of options){
       cells.push(nb);
       if(dfs(nb)) return true;
@@ -473,6 +520,115 @@ function findPath(start){
 function pickStartCell(){
   const valid = startCells.filter(s=>findPath(s));
   return valid.length ? valid[Math.floor(Math.random()*valid.length)] : startCells[0];
+}
+
+function pathKey(path){
+  return (path||[]).map(p=>`${Math.round(p.x)},${Math.round(p.y)}`).join('|');
+}
+function generateRouteOptions(maxRoutes=3){
+  const routes=[];
+  const seen=new Set();
+  const starts = startCells.length ? startCells : [{r:0,c:4}];
+  for(let tries=0; tries<80 && routes.length<maxRoutes; tries++){
+    const start = starts[tries % starts.length];
+    const path = findPath(start);
+    if(!path || path.length<2) continue;
+    const key = pathKey(path);
+    if(seen.has(key)) continue;
+    seen.add(key);
+    routes.push(path);
+  }
+  if(routes.length===0){
+    const fallback = findPath(pickStartCell());
+    if(fallback) routes.push(fallback);
+  }
+  return routes;
+}
+function createWaveRoutePlan(waveNumber, mods={}){
+  const w = WAVES[waveNumber-1];
+  if(!w) return null;
+  const routes = generateRouteOptions(3);
+  if(!routes.length) return null;
+  let groups = routes.map((path,i)=>({index:i, name:`Route ${i+1}`, path, counts:{}, entries:[]}));
+  const countMul = mods.enemyCountMul || 1;
+  let seq = 0;
+  function addToPlan(id, count){
+    for(let i=0;i<count;i++){
+      const g = groups[seq % groups.length];
+      g.entries.push(id);
+      g.counts[id] = (g.counts[id] || 0) + 1;
+      seq++;
+    }
+  }
+  for(const [id,n] of w.list){
+    addToPlan(id, Math.max(1, Math.round(n * countMul)));
+  }
+  for(let i=0;i<(mods.extraElite||0);i++) addToPlan('numb', 1);
+  groups = groups.filter(g=>g.entries.length>0);
+  groups.forEach((g,i)=>{ g.index=i; g.name=`Route ${i+1}`; });
+  return {wave:waveNumber, groups};
+}
+function ensureWaveRoutePlan(mods=null){
+  if(!state) return null;
+  if(!state.waveRoutePlan || state.waveRoutePlan.wave !== state.wave){
+    state.waveRoutePlan = createWaveRoutePlan(state.wave, mods || state.nextWaveMods || defaultNextWaveMods());
+    state.selectedRouteIndex = null;
+  }
+  return state.waveRoutePlan;
+}
+function selectWaveRoute(index){
+  if(!state?.waveRoutePlan?.groups?.[index]) return;
+  state.selectedRouteIndex = state.selectedRouteIndex === index ? null : index;
+  updateAllUI(false);
+}
+window.selectWaveRoute = selectWaveRoute;
+function renderWaveRouteInfo(){
+  const plan = ensureWaveRoutePlan(state.phase === 'battle' ? state.currentWaveEventMods : state.nextWaveMods);
+  if(!plan?.groups?.length) return '<span>No route preview available.</span>';
+  const selected = state.selectedRouteIndex;
+  return `<b>Wave ${state.wave} Enemies by Route:</b><br>` + plan.groups.map((g,i)=>{
+    const chips = Object.entries(g.counts).map(([id,n])=>`<span class="route-enemy-chip"><img src="${ENEMY_IMGS[id]}"><span>${ENEMIES[id]?.name || id} ×${n}</span></span>`).join('');
+    const label = selected === i ? 'shown on map' : 'click to preview';
+    return `<div class="route-group ${selected===i?'selected':''}" onclick="selectWaveRoute(${i})"><div class="route-title"><span>${g.name}</span><span>${label}</span></div><div class="route-enemies">${chips}</div></div>`;
+  }).join('');
+}
+function drawPathLine(path){
+  if(!path || path.length<2) return;
+  ctx.beginPath();
+  ctx.moveTo(path[0].x, path[0].y);
+  for(let i=1;i<path.length;i++) ctx.lineTo(path[i].x, path[i].y);
+}
+function drawArrowHead(from, to, size=13){
+  const ang = Math.atan2(to.y-from.y, to.x-from.x);
+  ctx.beginPath();
+  ctx.moveTo(to.x, to.y);
+  ctx.lineTo(to.x - Math.cos(ang-Math.PI/6)*size, to.y - Math.sin(ang-Math.PI/6)*size);
+  ctx.lineTo(to.x - Math.cos(ang+Math.PI/6)*size, to.y - Math.sin(ang+Math.PI/6)*size);
+  ctx.closePath();
+  ctx.fill();
+}
+function drawSelectedRouteOverlay(){
+  if(state.phase!=='deploy' && state.phase!=='battle') return;
+  const plan = state.waveRoutePlan;
+  const idx = state.selectedRouteIndex;
+  if(!plan || idx == null || !plan.groups?.[idx]) return;
+  const path = plan.groups[idx].path;
+  if(!path || path.length<2) return;
+  ctx.save();
+  ctx.lineCap='round';
+  ctx.lineJoin='round';
+  ctx.strokeStyle='rgba(17,24,39,.78)';
+  ctx.lineWidth=15;
+  drawPathLine(path); ctx.stroke();
+  ctx.strokeStyle='rgba(250,204,21,.95)';
+  ctx.lineWidth=8;
+  drawPathLine(path); ctx.stroke();
+  ctx.fillStyle='rgba(250,204,21,.98)';
+  for(let i=1;i<path.length;i+=3) drawArrowHead(path[i-1], path[i], 13);
+  const first = path[0], last = path[path.length-1];
+  ctx.fillStyle='rgba(34,197,94,.95)'; ctx.beginPath(); ctx.arc(first.x, first.y, 12, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(239,68,68,.95)'; ctx.beginPath(); ctx.arc(last.x, last.y, 12, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 
 // ========== V4 7天波次机制与压力 ==========
@@ -528,6 +684,375 @@ const TOWERS = [
 ];
 const towerById = Object.fromEntries(TOWERS.map(t=>[t.id,t]));
 
+
+// Upgrade effects that directly change the visible/combat tower stats.
+// level 1 uses index 0, level 2 uses index 1, level 3 uses index 2.
+// Mechanic-only upgrades (mark, slow, chain, stress, AP, etc.) are kept for separate systems.
+const TOWER_UPGRADE_STAT_EFFECTS = {
+ focus_note:[{atk:2,rate:.5},{rate:1.5},{rate:1,range:1}],
+ tomato_clock:[{atk:3},{},{atk:3,rate:2}],
+ flow_prism:[{},{range:1,rate:2},{aoe:.8}],
+ plan_cannon:[{atk:10},{rate:.5},{atk:50}],
+ milestone_cannon:[{atk:10},{rate:1,range:1},{}],
+ matrix_breaker:[{atk:10},{atk:40},{aoe:.8}],
+ checklist_mortar:[{atk:10},{aoe:.5},{atk:30}],
+ multithread_list:[{rate:1.5},{atk:-3},{atk:-4}],
+ archive_storm:[{atk:50},{range:3},{aoe:.5}],
+ calm_spray:[{},{},{rate:1,range:3}],
+ breath_beat:[{aoe:.5},{},{}],
+ time_anchor:[{},{},{rate:.2}],
+ arc_link:[{atk:4},{},{rate:1}],
+ support_hotline:[{rate:2},{},{}],
+ resonance_net:[{atk:10},{},{}],
+ boundary_sentry:[{rate:.7},{},{aoe:.8}],
+ reject_threshold:[{},{},{}],
+ safe_boundary:[{},{},{}],
+ review_mark:[{},{},{}],
+ mistake_book:[{},{},{}],
+ insight_reader:[{},{aoe:.4},{range:2,aoe:.4}],
+ rest_lighthouse:[{},{aoe:.2},{}],
+ sleep_pod:[{},{},{}],
+ safe_house:[{},{},{}]
+};
+
+function getTowerStats(tower){
+ const def = tower.def || towerById[tower.id];
+ const stats = {
+  atk:def.atk || 0,
+  rate:def.rate || 0,
+  range:def.range || 0,
+  aoe:def.aoe || 0
+ };
+ const effects = TOWER_UPGRADE_STAT_EFFECTS[def.id] || [];
+ for(let i=0;i<(tower.level||0);i++){
+  const e = effects[i] || {};
+  if(e.atk) stats.atk += e.atk;
+  if(e.rate) stats.rate += e.rate;
+  if(e.range) stats.range += e.range;
+  if(e.aoe) stats.aoe += e.aoe;
+ }
+ stats.atk = Math.max(1, stats.atk);
+ stats.rate = Math.max(.1, stats.rate);
+ stats.range = Math.max(.1, stats.range);
+ stats.aoe = Math.max(0, stats.aoe);
+ return stats;
+}
+
+function getSupportAuraBonuses(tower){
+ const bonus = {rateMul:1, rangeBonus:0};
+ if(!state || !state.placedTowers) return bonus;
+ for(const aura of state.placedTowers){
+  if(aura===tower || aura.def?.id!=='support_hotline') continue;
+  const auraStats = getTowerStats(aura);
+  if(dist(aura,tower) <= auraStats.range*C){
+   bonus.rateMul += (aura.level||0) >= 3 ? 0.50 : 0.25;
+   if((aura.level||0) >= 2) bonus.rangeBonus += 1;
+  }
+ }
+ return bonus;
+}
+
+function getBuffedTowerStats(tower){
+ const s = getTowerStats(tower);
+ const aura = getSupportAuraBonuses(tower);
+ return {
+  atk:s.atk * state.temp.towerDamage,
+  rate:s.rate * state.temp.towerRate * aura.rateMul,
+  range:s.range * state.temp.towerRange + aura.rangeBonus,
+  aoe:s.aoe
+ };
+}
+
+function fmtStat(v){
+ return Number.isInteger(v) ? String(v) : String(Math.round(v*10)/10);
+}
+
+function getProjectileCount(tower){
+ if(tower.def.id==='multithread_list'){
+  if((tower.level||0)>=3) return 4;
+  if((tower.level||0)>=2) return 2;
+ }
+ return 1;
+}
+
+function showPurchaseSuccess(name, price){
+ showToast(`Purchased ${name} (-${price}G).`);
+}
+
+const WORK_LEVEL_TABLE = {
+ 1:{gold:30, exp:20, stress:8, need:30},
+ 2:{gold:45, exp:30, stress:10, need:50},
+ 3:{gold:70, exp:45, stress:13, need:80},
+ 4:{gold:80, exp:60, stress:16, need:120},
+ 5:{gold:130, exp:0, stress:20, need:null}
+};
+const KNOWLEDGE_LEVEL_TABLE = {
+ 1:{gain:20, stress:7, need:20},
+ 2:{gain:30, stress:9, need:50},
+ 3:{gain:40, stress:11, need:90},
+ 4:{gain:50, stress:14, need:150},
+ 5:{gain:0, stress:0, need:null}
+};
+const RESTAURANT_LEVEL_TABLE = {
+ 1:{permStress:-12, tempStress:15, upgradeCost:150},
+ 2:{permStress:-18, tempStress:25, upgradeCost:300},
+ 3:{permStress:-26, tempStress:35, upgradeCost:null}
+};
+
+function getLevelTable(kind){
+ return kind === 'work' ? WORK_LEVEL_TABLE : KNOWLEDGE_LEVEL_TABLE;
+}
+function maxLevelOf(table){
+ return Math.max(...Object.keys(table).map(Number));
+}
+function totalExpNeededForLevel(kind, level){
+ const table = getLevelTable(kind);
+ const maxLv = maxLevelOf(table);
+ const target = Math.max(1, Math.min(level || 1, maxLv));
+ let total = 0;
+ for(let lv=1; lv<target; lv++) total += table[lv]?.need || 0;
+ return total;
+}
+function expProgress(totalExp, level, kind){
+ const table = getLevelTable(kind);
+ const maxLv = maxLevelOf(table);
+ const currentLv = Math.max(1, Math.min(level || 1, maxLv));
+ const rule = table[currentLv];
+ if(currentLv >= maxLv || !rule.need){
+  return {current:Math.max(0, totalExp || 0), need:0, remain:0, pct:100, max:true};
+ }
+ const base = totalExpNeededForLevel(kind, currentLv);
+ const need = rule.need;
+ const cur = Math.max(0, (totalExp || 0) - base);
+ const clamped = Math.min(cur, need);
+ return {current: clamped, need, remain: Math.max(0, need - clamped), pct: need ? Math.min(100, Math.round(clamped / need * 100)) : 100, max:false};
+}
+
+function syncLevelFromExp(kind){
+ if(!state) return;
+ const expKey = kind === 'work' ? 'work' : 'knowledge';
+ const lvKey = kind === 'work' ? 'workLv' : 'knowledgeLv';
+ const table = getLevelTable(kind);
+ const maxLv = maxLevelOf(table);
+ let lv = Math.max(1, Math.min(state[lvKey] || 1, maxLv));
+ let upgraded = false;
+ while(lv < maxLv && (state[expKey] || 0) >= totalExpNeededForLevel(kind, lv + 1)){
+  lv++;
+  upgraded = true;
+ }
+ if(lv !== state[lvKey]){
+  state[lvKey] = lv;
+  if(upgraded) showToast(`${kind === 'work' ? 'Work' : 'Knowledge'} Lv Up! Lv ${lv}`);
+ }
+}
+
+function gainKnowledge(amount, source='Knowledge'){
+ if(!amount) return;
+ state.knowledge = Math.max(0, (state.knowledge || 0) + amount);
+ syncLevelFromExp('knowledge');
+ log(`${source}: Knowledge +${amount}`);
+}
+
+function gainWork(amount, source='Work'){ 
+ if(!amount) return;
+ state.work = Math.max(0, (state.work || 0) + amount);
+ syncLevelFromExp('work');
+ log(`${source}: Work EXP +${amount}`);
+}
+
+function getTowerUpgradeCap(){
+ const lv = state?.knowledgeLv || 1;
+ if(lv >= 5) return 3;
+ if(lv >= 4) return 2;
+ if(lv >= 2) return 1;
+ return 0;
+}
+function requiredKnowledgeLvForUpgrade(nextUpgradeLevel){
+ if(nextUpgradeLevel <= 1) return 2;
+ if(nextUpgradeLevel <= 2) return 4;
+ return 5;
+}
+function isRarityUnlocked(rarity){
+ const lv = state?.knowledgeLv || 1;
+ if(rarity === 'basic') return true;
+ if(rarity === 'rare') return lv >= 3;
+ if(rarity === 'legendary') return lv >= 4;
+ return true;
+}
+function getAvailableTowerShopItems(){
+ return TOWERS.filter(t=>isRarityUnlocked(t.rarity));
+}
+function getAvailableNightShopCatalog(){
+ return NIGHT_SHOP_CATALOG.filter(item=>{
+  const def = item.kind === 'buff' ? buffById[item.id] : tacticById[item.id];
+  return def && isRarityUnlocked(def.rarity);
+ });
+}
+
+function clampGold(){ state.gold = Math.max(0, Math.round(state.gold)); }
+
+function defaultNextWaveMods(){
+ return {enemyCountMul:1, enemyHpMul:1, towerDamageMul:1, towerRateMul:1, extraElite:0, winGoldBonus:0, winStressReduction:0, endStressPenalty:0, freeTacticSkill:0};
+}
+function mergeNextWaveMods(mods={}){
+ state.nextWaveMods = state.nextWaveMods || defaultNextWaveMods();
+ if(mods.enemyCountMul) state.nextWaveMods.enemyCountMul *= mods.enemyCountMul;
+ if(mods.enemyHpMul) state.nextWaveMods.enemyHpMul *= mods.enemyHpMul;
+ if(mods.towerDamageMul) state.nextWaveMods.towerDamageMul *= mods.towerDamageMul;
+ if(mods.towerRateMul) state.nextWaveMods.towerRateMul *= mods.towerRateMul;
+ if(mods.extraElite) state.nextWaveMods.extraElite += mods.extraElite;
+ if(mods.winGoldBonus) state.nextWaveMods.winGoldBonus += mods.winGoldBonus;
+ if(mods.winStressReduction) state.nextWaveMods.winStressReduction += mods.winStressReduction;
+ if(mods.endStressPenalty) state.nextWaveMods.endStressPenalty += mods.endStressPenalty;
+ if(mods.freeTacticSkill) state.nextWaveMods.freeTacticSkill += mods.freeTacticSkill;
+}
+function applyTempMod(k,v){
+ if(['towerRate','towerDamage','towerRange','enemySpeed'].includes(k)) state.temp[k] *= v;
+ else state.temp[k] = v;
+}
+function grantRandomBuff(filterFn=()=>true){
+ const candidates = BUFFS.filter(filterFn);
+ if(candidates.length) addBuffToInventory(rand(candidates).id);
+}
+function grantRandomTactic(filterFn=()=>true){
+ const candidates = TACTICS.filter(filterFn);
+ if(candidates.length) addTacticToInventory(rand(candidates).id);
+}
+function consumeNextActionRewardMul(){
+ const mul = state.nextActionRewardMul || 1;
+ state.nextActionRewardMul = 1;
+ if(mul !== 1) log(`Next action reward modifier consumed: x${Math.round(mul*100)}%`);
+ return mul;
+}
+function consumeNextOfficeGoldMul(){
+ const mul = state.nextOfficeGoldMul || 1;
+ state.nextOfficeGoldMul = 1;
+ if(mul !== 1) log(`Next office gold modifier consumed: x${Math.round(mul*100)}%`);
+ return mul;
+}
+
+function getEffectiveSlowMul(e, rawMul){
+ // Numbness: after HP drops below 50%, slow effects are reduced by 50%.
+ if(e?.type === 'numb' && e.hp <= e.maxHp * 0.5) return 1 - (1 - rawMul) * 0.5;
+ return rawMul;
+}
+function applySlow(e, slowMul, duration){
+ e.slow = Math.max(e.slow || 0, duration);
+ e.rawSlowMul = Math.min(e.rawSlowMul || 1, slowMul);
+ e.slowMul = getEffectiveSlowMul(e, e.rawSlowMul);
+}
+function getCurrentSlowMul(e){
+ if((e.slow || 0) <= 0) return 1;
+ return getEffectiveSlowMul(e, e.rawSlowMul || e.slowMul || 1);
+}
+
+function setVulnerability(e, amount, duration){
+ e.vuln = Math.max(e.vuln || 0, amount);
+ e.vulnTimer = Math.max(e.vulnTimer || 0, duration);
+ e.marked = true;
+}
+
+function reduceEnemyArmor(e, amount){
+ const before = e.armor ?? (e.def.armor || 0);
+ e.armor = Math.max(0, before - amount);
+ if(e.armor < before) state.fx.push({kind:'armorBreak',x:e.x,y:e.y,val:before-e.armor,life:.55});
+}
+
+function knockbackEnemy(e, cells){
+ if(!e.path || e.path.length<2) return;
+ e.pi = Math.max(1, e.pi - cells);
+ const target = e.path[Math.max(0, e.pi-1)];
+ if(target){ e.x = target.x; e.y = target.y; e.progress = e.pi/e.path.length; }
+}
+
+function applyStartOfWaveTowerEffects(){
+ let stressReduce = 0;
+ let knowledgeGain = 0;
+ for(const t of state.placedTowers){
+  const lv = t.level || 0;
+  if(t.def.id === 'safe_boundary') stressReduce += 20 * (1 + lv);
+  if(t.def.id === 'sleep_pod') knowledgeGain += 10 * (1 + lv);
+ }
+ if(stressReduce>0){ addStress(-stressReduce); log(`Safe Boundary: Stress -${stressReduce}`); }
+ if(knowledgeGain>0){ gainKnowledge(knowledgeGain, 'Sleep Pod'); showToast(`Sleep Pod: Knowledge +${knowledgeGain}`); }
+}
+
+function applyEndOfWaveTowerEffects(){
+ const result = {apBonus:0};
+ let stressReduce = 0;
+ let goldGain = 0;
+ for(const t of state.placedTowers){
+  const lv = t.level || 0;
+  if(t.def.id === 'rest_lighthouse'){
+   stressReduce += 3;
+   if(lv>=1) stressReduce += 1;
+   if(lv>=3 && (state.leaksThisWave||0)===0) stressReduce += 2;
+  }
+  if(t.def.id === 'safe_house'){
+   result.apBonus += 1;
+   if(lv>=1) goldGain += 20;
+   if(lv>=2) goldGain += 20;
+   if(lv>=3) result.apBonus += 1;
+  }
+ }
+ if(stressReduce>0){ addStress(-stressReduce); log(`Rest Lighthouse: Stress -${stressReduce}`); }
+ if(goldGain>0){ state.gold += goldGain; log(`Safe House: Gold +${goldGain}`); }
+ if(result.apBonus>0) log(`Safe House: Next day AP +${result.apBonus}`);
+ return result;
+}
+
+function applyTowerHit(tower, enemy, baseDamage){
+ if(!state.enemies.includes(enemy)) return;
+ const id = tower.def.id;
+ const lv = tower.level || 0;
+ let dmg = baseDamage;
+
+ if(id === 'flow_prism'){
+  if(tower.lastTargetId === enemy.id) tower.focusStacks = Math.min(lv>=1 ? 10 : 5, (tower.focusStacks || 0) + 1);
+  else { tower.lastTargetId = enemy.id; tower.focusStacks = 1; }
+  dmg *= 1 + 0.12 * Math.max(0, (tower.focusStacks || 1) - 1);
+ }
+ if(id === 'tomato_clock' && state.combatTime >= 5) dmg *= lv>=2 ? 1.35 : 1.20;
+ if(id === 'plan_cannon') reduceEnemyArmor(enemy, 1);
+ if(id === 'matrix_breaker') reduceEnemyArmor(enemy, 2);
+ if(id === 'milestone_cannon') setVulnerability(enemy, lv>=3 ? 0.30 : 0.20, 5);
+ if(id === 'calm_spray') applySlow(enemy, lv>=1 ? 0.50 : 0.75, lv>=2 ? 2.5 : 2.0);
+ if(id === 'breath_beat'){
+  applySlow(enemy, lv>=2 ? 0.50 : 0.75, 2.5);
+  tower.pulseCount = (tower.pulseCount || 0) + 1;
+  if(lv>=3 && tower.pulseCount % 3 === 0) enemy.stun = Math.max(enemy.stun || 0, enemy.def.size==='boss' ? .6 : 1.2);
+ }
+ if(id === 'time_anchor') enemy.stun = Math.max(enemy.stun || 0, (enemy.def.size==='boss' ? .25 : .55) + (lv>=1?.2:0) + (lv>=2?.2:0));
+ if(id === 'resonance_net'){
+  const perBuff = lv>=3 ? 0.25 : lv>=2 ? 0.20 : 0.10;
+  dmg *= 1 + (state.activeBuffIds.length || 0) * perBuff;
+ }
+ if(id === 'boundary_sentry' && enemy.progress >= .65) dmg *= lv>=2 ? 1.80 : 1.50;
+ if(id === 'reject_threshold' && (enemy.knockCd || 0) <= 0){
+  knockbackEnemy(enemy, lv>=2 ? 3 : 2);
+  enemy.knockCd = lv>=1 ? 5 : 7;
+  if(lv>=3) setVulnerability(enemy, .25, 4);
+ }
+ if(id === 'review_mark') setVulnerability(enemy, lv>=3 ? 1.00 : .50, lv>=2 ? 5 : 4);
+ if(id === 'insight_reader') setVulnerability(enemy, lv>=1 ? 1.00 : .50, 5);
+ if(id === 'mistake_book'){
+  const pct = lv>=2 ? .15 : lv>=1 ? .10 : .05;
+  const maxBonus = lv>=3 ? 200 : 100;
+  dmg += Math.min(maxBonus, enemy.maxHp * pct);
+ }
+
+ damageEnemy(enemy, dmg, tower);
+
+ if(id === 'arc_link'){
+  const chainCount = lv>=2 ? 2 : 1;
+  const chainTargets = state.enemies
+   .filter(e=>e!==enemy && dist(enemy,e)<=2.2*C)
+   .sort((a,b)=>dist(enemy,a)-dist(enemy,b))
+   .slice(0, chainCount);
+  for(const e of chainTargets) damageEnemy(e, dmg*.65, tower);
+ }
+}
+
 const BUFFS=[
  {id:'ob1',name:'Deep Breath',kind:'One-time',rarity:'basic',price:30,stress:7,desc:'Stress -5 at start of wave.', apply:()=>{addStress(-5);log('Deep Breath: Stress -5');}},
  {id:'ob2',name:'Temp Supply',kind:'One-time',rarity:'basic',price:30,stress:7,desc:'Gold +40 at start of wave.', apply:()=>{state.gold+=40;log('Temp Supply: Gold +40');}},
@@ -551,7 +1076,13 @@ const EXTRA_BUFFS = [
  {id:'backup_power',name:'Backup Power',kind:'Passive',rarity:'basic',price:55,stress:8,power:16,desc:'All towers gain +8% damage this night.',mods:{towerDamage:1.08}},
  {id:'emergency_plan',name:'Emergency Plan',kind:'Passive',rarity:'basic',price:60,stress:9,power:18,desc:'All towers gain +10% fire rate this night.',mods:{towerRate:1.10}},
  {id:'cold_water',name:'Cold Water Splash',kind:'One-time',rarity:'basic',price:40,stress:6,power:12,desc:'Reduce stress by 8 when the wave starts.',apply:()=>{addStress(-8);log('Cold Water Splash: Stress -8');}},
- {id:'anchor',name:'Stable Anchor',kind:'Passive',rarity:'rare',price:95,stress:16,power:24,desc:'Locks stress at 99 once this night.',mods:{lastBreath:true}}
+ {id:'anchor',name:'Stable Anchor',kind:'Passive',rarity:'rare',price:95,stress:16,power:24,desc:'Locks stress at 99 once this night.',mods:{lastBreath:true}},
+ {id:'event_mutual_support',name:'Mutual Support',kind:'Passive',rarity:'rare',price:80,stress:0,power:20,desc:'Event Buff: all towers gain +8% fire rate tonight.',mods:{towerRate:1.08}},
+ {id:'event_well_fed',name:'Well Fed',kind:'Passive',rarity:'basic',price:45,stress:0,power:14,desc:'Event Buff: all towers gain +5% damage tonight.',mods:{towerDamage:1.05}},
+ {id:'event_emotion_buffer',name:'Emotional Buffer',kind:'Passive',rarity:'rare',price:90,stress:0,power:22,desc:'Event Buff: first leak this wave causes 50% less stress.',mods:{emotionBuffer:true}},
+ {id:'event_last_minute_boost',name:'Last-minute Boost',kind:'One-time',rarity:'rare',price:80,stress:0,power:24,desc:'One-time Event Buff: all towers gain +15% damage this wave.',mods:{towerDamage:1.15}},
+ {id:'event_quick_review',name:'Quick Review',kind:'One-time',rarity:'basic',price:35,stress:0,power:12,desc:'One-time Event Buff: all towers gain +10% fire rate this wave.',mods:{towerRate:1.10}},
+ {id:'event_burst_focus',name:'Burst Focus',kind:'One-time',rarity:'rare',price:90,stress:0,power:28,desc:'One-time Event Buff: all towers gain +20% damage this wave.',mods:{towerDamage:1.20}}
 ];
 const EXTRA_TACTICS = [
  {id:'sticky_block',name:'Sticky Note Barricade',rarity:'basic',price:55,stress:8,power:14,consume:true,desc:'All enemies are slowed by 45% for 5s.'},
@@ -583,15 +1114,15 @@ const NIGHT_SHOP_CATALOG = [
 ];
 
 const ENEMIES={
- thought:{name:'Thought',hp:64,speed:.70,armor:0,damage:1,size:'small', baseLeak:3, baseGold:5},
- urgency:{name:'Urgency',hp:64,speed:1.16,armor:0,damage:1,size:'small', baseLeak:4, baseGold:6},
- shell:{name:'Shell',hp:230,speed:.49,armor:2,damage:2,size:'large', baseLeak:8, baseGold:12},
+ thought:{name:'Thought',hp:64,speed:.70,armor:0,damage:1,size:'small', baseLeak:3, baseGold:5, special:'none'},
+ urgency:{name:'Urgency',hp:64,speed:1.16,armor:0,damage:1,size:'small', baseLeak:4, baseGold:6, special:'haste60'},
+ shell:{name:'Shell',hp:230,speed:.49,armor:2,damage:2,size:'large', baseLeak:8, baseGold:12, special:'lowDamageReduction'},
  repeat:{name:'Repeat',hp:140,speed:.63,armor:0,damage:1,size:'mid', baseLeak:6, baseGold:7, special:'split'},
- smallThought:{name:'Small Thought',hp:40,speed:.84,armor:0,damage:1,size:'small', baseLeak:2, baseGold:2},
- rational:{name:'Rationalization',hp:180,speed:.56,armor:0,damage:2,size:'mid', baseLeak:8, baseGold:12},
- noise:{name:'Noise',hp:160,speed:.60,armor:0,damage:2,size:'mid', baseLeak:9, baseGold:14},
- avoid:{name:'Avoidance',hp:120,speed:.81,armor:0,damage:1,size:'small', baseLeak:6, baseGold:12},
- numb:{name:'Numbness',hp:400,speed:.39,armor:1,damage:3,size:'large', baseLeak:12, baseGold:20},
+ smallThought:{name:'Small Thought',hp:40,speed:.84,armor:0,damage:1,size:'small', baseLeak:2, baseGold:2, special:'splitChild'},
+ rational:{name:'Rationalization',hp:180,speed:.56,armor:0,damage:2,size:'mid', baseLeak:8, baseGold:12, special:'shieldAura'},
+ noise:{name:'Noise',hp:160,speed:.60,armor:0,damage:2,size:'mid', baseLeak:9, baseGold:14, special:'jamTower'},
+ avoid:{name:'Avoidance',hp:120,speed:.81,armor:0,damage:1,size:'small', baseLeak:6, baseGold:12, special:'stealthCycle'},
+ numb:{name:'Numbness',hp:400,speed:.39,armor:1,damage:3,size:'large', baseLeak:12, baseGold:20, special:'slowResist'},
  deadline:{name:'Deadline Boss',hp:8000,speed:.32,armor:3,damage:5,size:'boss', baseLeak:100, baseGold:0, special:'boss'}
 };
 
@@ -611,23 +1142,38 @@ let state;
 function createSnapshot() {
     return {
         day: state.day, phase: state.phase, wave: state.wave, stress: state.stress,
-        gold: state.gold, ap: state.ap, workLv: state.workLv, knowledgeLv: state.knowledgeLv,
+        gold: state.gold, ap: state.ap, knowledge: state.knowledge || 0, work: state.work || 0, workLv: state.workLv, knowledgeLv: state.knowledgeLv,
         restaurantLv: state.restaurantLv,
         towerInventory: {...state.towerInventory}, buffInventory: {...state.buffInventory},
         tacticInventory: {...state.tacticInventory},
-        placedTowers: state.placedTowers.map(t => ({...t})) // 深度拷贝已放置的塔
+        placedTowers: state.placedTowers.map(t => ({...t})), // 深度拷贝已放置的塔
+        mindEventTriggeredToday: !!state.mindEventTriggeredToday,
+        nextWaveMods: {...(state.nextWaveMods || defaultNextWaveMods())},
+        currentWaveEventMods: {...(state.currentWaveEventMods || defaultNextWaveMods())},
+        nextOfficeGoldMul: state.nextOfficeGoldMul || 1,
+        nextActionRewardMul: state.nextActionRewardMul || 1,
+        nextActionFree: !!state.nextActionFree,
+        freeTacticSkillCharges: state.freeTacticSkillCharges || 0
     };
 }
 function loadSnapshot(snap) {
     if(!snap) return newGame();
     state.day = snap.day; state.phase = snap.phase; state.wave = snap.wave; state.stress = snap.stress;
-    state.gold = snap.gold; state.ap = snap.ap; state.workLv = snap.workLv; state.knowledgeLv = snap.knowledgeLv;
+    state.gold = snap.gold; state.ap = snap.ap; state.knowledge = snap.knowledge || 0; state.work = snap.work || 0; state.workLv = snap.workLv || 1; state.knowledgeLv = snap.knowledgeLv || 1;
     state.restaurantLv = snap.restaurantLv;
     state.towerInventory = {...snap.towerInventory}; state.buffInventory = {...snap.buffInventory};
     state.tacticInventory = {...snap.tacticInventory};
+    state.mindEventTriggeredToday = !!snap.mindEventTriggeredToday;
+    state.nextWaveMods = {...defaultNextWaveMods(), ...(snap.nextWaveMods || {})};
+    state.currentWaveEventMods = {...defaultNextWaveMods(), ...(snap.currentWaveEventMods || {})};
+    state.nextOfficeGoldMul = snap.nextOfficeGoldMul || 1;
+    state.nextActionRewardMul = snap.nextActionRewardMul || 1;
+    state.nextActionFree = !!snap.nextActionFree;
+    state.freeTacticSkillCharges = snap.freeTacticSkillCharges || 0;
     // 恢复对 def 对象的引用
     state.placedTowers = snap.placedTowers.map(t => { t.def = towerById[t.id]; return t; });
     state.enemies=[]; state.projectiles=[]; state.fx=[]; state.tempStressReduction=0; state.spawner=null;
+    state.waveRoutePlan=null; state.selectedRouteIndex=null;
     updateAllUI();
 }
 
@@ -640,7 +1186,10 @@ function newGame(){
   placedTowers:[], selectedTowerId:null, selectedPlaced:null, placementMode:null,
   enemies:[], projectiles:[], fx:[], blockers:[], spawner:null, combatTime:0, timeScale:1, 
   waveMultipliers: {hp:1, spd:1, gold:1, leak:1}, effStress: 0,
-  temp:{towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false},
+  temp:{towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false, emotionBuffer:false},
+  mindEventTriggeredToday:false, nextWaveMods:defaultNextWaveMods(), currentWaveEventMods:defaultNextWaveMods(),
+  nextOfficeGoldMul:1, nextActionRewardMul:1, nextActionFree:false, freeTacticSkillCharges:0,
+  waveRoutePlan:null, selectedRouteIndex:null,
   daySnapshot: null, nightSnapshot: null
  };
  addTowerToInventory('focus_note',1,false); addTowerToInventory('calm_spray',1,false);
@@ -667,6 +1216,17 @@ function beep(freq=600,dur=.08,type='sine',vol=.035){
  const o=audio.ctx.createOscillator(), g=audio.ctx.createGain(); o.frequency.value=freq; o.type=type; g.gain.value=vol;
  o.connect(g); g.connect(audio.ctx.destination); o.start();
  g.gain.exponentialRampToValueAtTime(0.0001,audio.ctx.currentTime+dur); o.stop(audio.ctx.currentTime+dur);
+}
+
+function frequencySweep(startFreq, endFreq, dur, type='sine', vol=0.08){
+ if(!audio.on||!audio.ctx) return;
+ const o=audio.ctx.createOscillator(), g=audio.ctx.createGain();
+ o.frequency.setValueAtTime(startFreq, audio.ctx.currentTime);
+ o.frequency.exponentialRampToValueAtTime(endFreq, audio.ctx.currentTime+dur);
+ o.type=type;
+ g.gain.value=vol;
+ o.connect(g); g.connect(audio.ctx.destination); o.start();
+ g.gain.exponentialRampToValueAtTime(0.0001, audio.ctx.currentTime+dur); o.stop(audio.ctx.currentTime+dur);
 }
 
 function addTowerToInventory(id,n=1,notify=true){ state.towerInventory[id]=(state.towerInventory[id]||0)+n; if(notify) log(`Acquired Tower [${towerById[id].name}] ×${n}`); }
@@ -754,9 +1314,19 @@ document.addEventListener('keydown',e=>{
  }
 });
 function updateNearPrompt(){
- const b=nearestBuilding(), p=document.getElementById('nearPrompt');
- if(state.phase==='day' && b && b.id!=='shop'){ p.textContent=`Near [${b.name}], Press Space`; p.classList.remove('hidden');}
- else p.classList.add('hidden');
+ const p=document.getElementById('nearPrompt');
+ if(!p) return;
+ if(!state || state.phase!=='day'){
+   p.classList.add('hidden');
+   return;
+ }
+ const b=nearestBuilding();
+ if(b && b.id!=='shop'){
+   p.textContent=`Near [${b.name}], Press Space`;
+   p.classList.remove('hidden');
+ } else {
+   p.classList.add('hidden');
+ }
 }
 
 function progressThen(title, done){
@@ -769,40 +1339,220 @@ function progressThen(title, done){
 function openIndoor(id){
  const actions=[];
  if(id==='office') {
-   const lv = state.workLv, gold = 25+lv*15, str = 8+lv*2;
+   syncLevelFromExp('work');
+   const lv = state.workLv || 1;
+   const rule = WORK_LEVEL_TABLE[lv] || WORK_LEVEL_TABLE[1];
+   const gold = rule.gold, str = rule.stress, baseWorkExp = rule.exp;
    const nextStr = state.stress + str;
    const disabled = state.ap < 1;
-   actions.push({title:'Work', primary:!disabled, danger:nextStr>=100, text:`-1 AP | +${gold} Gold | Stress +${str} (Next: ${nextStr})`, cb:()=>{if(!disabled) doAction(1, ()=>{state.gold+=gold; addStress(str);}, id)}});
+   const rewardMul = (state.nextActionRewardMul || 1) * (state.nextOfficeGoldMul || 1);
+   const finalGold = Math.max(0, Math.round(gold * rewardMul));
+   const finalWorkExp = Math.max(0, Math.round(baseWorkExp * (state.nextActionRewardMul || 1)));
+   actions.push({title:'Work', primary:!disabled || state.nextActionFree, danger:nextStr>=100, text:`${state.nextActionFree?'0':'-1'} AP | +${finalGold} Gold | Work EXP +${finalWorkExp} | Stress +${str} (Next: ${nextStr})`, cb:()=>{if(!disabled || state.nextActionFree) doAction(1, ()=>{state.gold+=finalGold; gainWork(finalWorkExp,'Work'); consumeNextActionRewardMul(); consumeNextOfficeGoldMul(); addStress(str);}, id, {baseGold:finalGold, baseWork:finalWorkExp})}});
  }
  else if(id==='library'){
-   const lv = state.knowledgeLv, str = 7+lv*2; const nextStr = state.stress + str;
+   syncLevelFromExp('knowledge');
+   const lv = state.knowledgeLv || 1;
+   const rule = KNOWLEDGE_LEVEL_TABLE[lv] || KNOWLEDGE_LEVEL_TABLE[1];
+   const str = rule.stress, baseKnowledgeGain = rule.gain;
+   const nextStr = state.stress + str;
+   const finalKnowledgeGain = Math.max(0, Math.round(baseKnowledgeGain * (state.nextActionRewardMul || 1)));
    const disabled = state.ap < 1;
-   actions.push({title:'Study', primary:!disabled, danger:nextStr>=100, text:`-1 AP | Unlock Tower | Stress +${str} (Next: ${nextStr})`, cb:()=>{if(!disabled) doAction(1, ()=>{addStress(str);}, id)}});
+   const progress = expProgress(state.knowledge||0, lv, 'knowledge');
+   const unlockNote = progress.max ? 'Max Lv: tower +3 unlocked' : `Next Lv needs ${progress.remain} Knowledge`;
+   actions.push({title:'Study', primary:!disabled || state.nextActionFree, danger:nextStr>=100, text:`${state.nextActionFree?'0':'-1'} AP | Knowledge +${finalKnowledgeGain} | Stress +${str} (Next: ${nextStr}) | ${unlockNote}`, cb:()=>{if(!disabled || state.nextActionFree) doAction(1, ()=>{gainKnowledge(finalKnowledgeGain,'Study'); consumeNextActionRewardMul(); addStress(str);}, id, {baseKnowledge:finalKnowledgeGain})}});
  }
  else if(id==='restaurant'){
-   const lv = state.restaurantLv, c1 = 35+(lv-1)*20, s1 = 12+(lv-1)*6;
-   const c2 = 30+(lv-1)*20, tempS = 15+(lv-1)*10;
-   const disabled1 = state.ap < 1 || state.gold < c1;
-   const disabled2 = state.ap < 1 || state.gold < c2;
-   actions.push({title:'Enjoy Meal (Permanent)', primary:!disabled1, text:`-1 AP, -${c1} Gold | Stress -${s1} (Next: ${Math.max(0,state.stress-s1)})`, cb:()=>{if(!disabled1) doAction(1, ()=>{state.gold-=c1; addStress(-s1);}, id)}});
-   actions.push({title:'Feast (Temp Night Relief)', primary:false, text:`-1 AP, -${c2} Gold | Effective Stress Tonight -${tempS}`, cb:()=>{if(!disabled2) doAction(1, ()=>{state.gold-=c2; state.tempStressReduction+=tempS;}, id)}});
+   const lv = Math.max(1, Math.min(state.restaurantLv || 1, 3));
+   state.restaurantLv = lv;
+   const rule = RESTAURANT_LEVEL_TABLE[lv];
+   const s1 = Math.abs(rule.permStress), tempS = rule.tempStress;
+   const disabled1 = state.ap < 1;
+   const disabled2 = state.ap < 1;
+   actions.push({title:'Meal (Permanent Relief)', primary:!disabled1 || state.nextActionFree, text:`${state.nextActionFree?'0':'-1'} AP | Cost 0 Gold | Stress -${s1} (Next: ${Math.max(0,state.stress-s1)})`, cb:()=>{if(!disabled1 || state.nextActionFree) doAction(1, ()=>{consumeNextActionRewardMul(); addStress(-s1);}, id)}});
+   actions.push({title:'Meal (Tonight Relief)', primary:false, text:`${state.nextActionFree?'0':'-1'} AP | Cost 0 Gold | Effective Stress Tonight -${tempS}`, cb:()=>{if(!disabled2 || state.nextActionFree) doAction(1, ()=>{consumeNextActionRewardMul(); state.tempStressReduction+=tempS;}, id)}});
+   if(rule.upgradeCost){
+     const cost = rule.upgradeCost;
+     actions.push({title:`Upgrade Restaurant to Lv${lv+1}`, primary:false, text:`-${cost} Gold | Permanent relief and tonight relief become stronger`, cb:()=>{if(state.gold<cost) return showToast('Not enough gold.'); state.gold-=cost; state.restaurantLv=lv+1; showToast(`Restaurant upgraded to Lv${lv+1}`); updateAllUI(); openIndoor('restaurant');}});
+   }
  }
  else if(id==='dorm'){
    const d1=state.stress+8, d2=state.stress+18, d3=state.stress+28;
    const disabled = state.ap < 1;
-   actions.push({title:'All Nighter (Gold)', primary:false, danger:d1>=100, text:`-1 AP | +50 Gold | Stress +8 (Next: ${d1})`, cb:()=>{if(!disabled) doAction(1,()=>{state.gold+=50; addStress(8);},id)}});
-   actions.push({title:'Late Plan (Buff)', primary:false, danger:d2>=100, text:`-1 AP | Random Buff | Stress +18 (Next: ${d2})`, cb:()=>{if(!disabled) doAction(1,()=>{addBuffToInventory('pb2'); addStress(18);},id)}});
-   actions.push({title:'Overdraw (Rare Tower)', primary:false, danger:d3>=100, text:`-1 AP | Rare Tower | Stress +28 (Next: ${d3})`, cb:()=>{if(!disabled) doAction(1,()=>{addTowerToInventory('tomato_clock'); addStress(28);},id)}});
+   actions.push({title:'All Nighter (Gold)', primary:false, danger:d1>=100, text:`${state.nextActionFree?'0':'-1'} AP | +${Math.round(50*(state.nextActionRewardMul||1))} Gold | Stress +8 (Next: ${d1})`, cb:()=>{if(!disabled || state.nextActionFree) doAction(1,()=>{state.gold+=Math.round(50*consumeNextActionRewardMul()); addStress(8);},id,{baseGold:Math.round(50*(state.nextActionRewardMul||1))})}});
+   actions.push({title:'Late Plan (Buff)', primary:false, danger:d2>=100, text:`${state.nextActionFree?'0':'-1'} AP | Random Buff | Stress +18 (Next: ${d2})`, cb:()=>{if(!disabled || state.nextActionFree) doAction(1,()=>{consumeNextActionRewardMul(); addBuffToInventory('pb2'); addStress(18);},id)}});
+   actions.push({title:'Overdraw (Rare Tower)', primary:false, danger:d3>=100, text:`${state.nextActionFree?'0':'-1'} AP | Rare Tower | Stress +28 (Next: ${d3})`, cb:()=>{if(!disabled || state.nextActionFree) doAction(1,()=>{consumeNextActionRewardMul(); addTowerToInventory('tomato_clock'); addStress(28);},id)}});
  }
  actions.push({title:'Leave', primary:false, text:'', cb:closeModal});
  showModal(BUILDING_NAMES[id], 'Choose your action:', actions, '', INDOOR_BGS[id], 'indoor');
 }
 
-function doAction(apCost, effect, id){
+const BUILDING_EVENT_PROB = {office:.15, library:.15, restaurant:.15, dorm:.15};
+const EVENT_BUILDINGS = new Set(['office','library','restaurant','dorm']);
+
+const BUILDING_EVENTS = {
+ office:[
+  {code:'O1',title:'Unexpected Overtime',text:'Your supervisor suddenly sends a message: "Can you take a quick look at this request tonight?"',choices:[
+   {title:'Do only the necessary part',text:'Gold +30 / Work EXP +20 / Stress +5',stressDelta:5,apply:(ctx)=>{state.gold+=30; gainWork(20,'Unexpected Overtime'); addStress(5);}},
+   {title:'Take everything on',text:'Gold +80 / Work EXP +50 / Stress +15 / Next wave enemy count +10%',stressDelta:15,apply:(ctx)=>{state.gold+=80; gainWork(50,'Unexpected Overtime'); addStress(15); mergeNextWaveMods({enemyCountMul:1.10});}},
+   {title:'Keep yourself steady first',text:'Stress -5 / This work gold reward is halved',apply:(ctx)=>{addStress(-5); const cut=Math.round((ctx.baseGold||0)*0.5); if(cut>0){state.gold-=cut; log('This work reward was halved: Gold -'+cut); clampGold();}}}
+  ]},
+  {code:'O2',title:'Pointless Meeting',text:'The meeting drags on, but the real point never appears.',choices:[
+   {title:'Listen carefully until the end',text:'Work EXP +20 / Stress +8',stressDelta:8,apply:()=>{gainWork(20,'Pointless Meeting'); addStress(8);}},
+   {title:'Quietly organize study notes',text:'Knowledge +20 / Stress +5',stressDelta:5,apply:()=>{gainKnowledge(20,'Pointless Meeting'); addStress(5);}},
+   {title:'Zone out for a moment',text:'Stress -5 / No extra Work EXP this time',apply:()=>{addStress(-5);}}
+  ]},
+  {code:'O3',title:'Coworker Needs Help',text:'A coworker looks like they are about to collapse under their tasks.',choices:[
+   {title:'Help them handle it',text:'Work EXP +25 / Gain Passive Buff [Mutual Support]',apply:()=>{gainWork(25,'Coworker Needs Help'); addBuffToInventory('event_mutual_support');}},
+   {title:'Focus on your own tasks',text:'Gold +40 / Stress +5',stressDelta:5,apply:()=>{state.gold+=40; addStress(5);}},
+   {title:'Chat and slack off together',text:'Stress -8 / This work gold reward is halved',apply:(ctx)=>{addStress(-8); const cut=Math.round((ctx.baseGold||0)*0.5); if(cut>0){state.gold-=cut; log('This work reward was halved: Gold -'+cut); clampGold();}}}
+  ]},
+  {code:'O4',title:'Performance Anxiety',text:'You start questioning yourself again: am I still not working hard enough?',choices:[
+   {title:'Push one more time',text:'Gold +60 / Work EXP +30 / Stress +12',stressDelta:12,apply:()=>{state.gold+=60; gainWork(30,'Performance Anxiety'); addStress(12);}},
+   {title:'Make a plan',text:'Next Office gold reward +30% / Stress +3',stressDelta:3,apply:()=>{state.nextOfficeGoldMul=(state.nextOfficeGoldMul||1)*1.30; addStress(3); log('Next office gold reward +30%.');}},
+   {title:'Stop and breathe',text:'Stress -10',apply:()=>{addStress(-10);}}
+  ]}
+ ],
+ library:[
+  {code:'L1',title:'Difficult Chapter',text:'You have read this chapter three times, and it still feels like an alien language.',choices:[
+   {title:'Power through it',text:'Knowledge +50 / Stress +12',stressDelta:12,apply:()=>{gainKnowledge(50,'Difficult Chapter'); addStress(12);}},
+   {title:'Switch to an introductory book',text:'Knowledge +10 / Stress -3',apply:()=>{gainKnowledge(10,'Difficult Chapter'); addStress(-3);}},
+   {title:'Put it aside for now',text:'Stress -10 / Cancel this study reward',apply:(ctx)=>{addStress(-10); const cut=ctx.baseKnowledge||0; if(cut>0){state.knowledge=Math.max(0,state.knowledge-cut); log('This study reward was cancelled: Knowledge -'+cut);}}}
+  ]},
+  {code:'L2',title:'Sudden Insight',text:'A problem that never made sense suddenly connects in your mind.',choices:[
+   {title:'Write it down',text:'Knowledge +40 / Stress +10',stressDelta:10,apply:()=>{gainKnowledge(40,'Sudden Insight'); addStress(10);}},
+   {title:'Apply it immediately',text:'Gain One-time Buff [Last-minute Boost] / Stress +5',stressDelta:5,apply:()=>{addBuffToInventory('event_last_minute_boost'); addStress(5);}},
+   {title:'Share it with someone',text:'Knowledge +10 / Stress -5',apply:()=>{gainKnowledge(10,'Sudden Insight'); addStress(-5);}}
+  ]},
+  {code:'L3',title:'Old Notes',text:'You find an old notebook full of annotations tucked inside the shelf.',choices:[
+   {title:'Absorb it quickly',text:'Knowledge +30',apply:()=>{gainKnowledge(30,'Old Notes');}},
+   {title:'Organize it carefully',text:'Knowledge +20 / Gain One-time Buff [Quick Review]',apply:()=>{gainKnowledge(20,'Old Notes'); addBuffToInventory('event_quick_review');}},
+   {title:'Read only the key points',text:'Knowledge +15 / Gold +20',apply:()=>{gainKnowledge(15,'Old Notes'); state.gold+=20;}}
+  ]},
+  {code:'L4',title:'Exam Hallucination',text:'There is no exam, but you suddenly feel completely unprepared.',choices:[
+   {title:'Keep studying',text:'Knowledge +60 / Stress +15',stressDelta:15,apply:()=>{gainKnowledge(60,'Exam Hallucination'); addStress(15);}},
+   {title:'Leave the library',text:'Stress -15 / This study reward is halved',apply:(ctx)=>{addStress(-15); const cut=Math.round((ctx.baseKnowledge||0)*0.5); if(cut>0){state.knowledge=Math.max(0,state.knowledge-cut); log('This study reward was halved: Knowledge -'+cut);}}},
+   {title:'Do a short quiz',text:'Knowledge +30 / Next wave enemy HP +15%',apply:()=>{gainKnowledge(30,'Exam Hallucination'); mergeNextWaveMods({enemyHpMul:1.15});}}
+  ]}
+ ],
+ restaurant:[
+  {code:'R1',title:'A Familiar Taste',text:'When the hot soup arrives, you suddenly feel that today may still be bearable.',choices:[
+   {title:'Eat something simple',text:'Gold -30 / Stress -8',apply:()=>{state.gold-=30; clampGold(); addStress(-8);}},
+   {title:'Have a proper meal',text:'Gold -70 / Stress -15 / Gain Passive Buff [Well Fed]',apply:()=>{state.gold-=70; clampGold(); addStress(-15); addBuffToInventory('event_well_fed');}},
+   {title:'Save money and leave',text:'Gold +20 / Stress +5',stressDelta:5,apply:()=>{state.gold+=20; addStress(5);}}
+  ]},
+  {code:'R2',title:'Long Queue',text:'The person in front still has not finished ordering, and you begin to feel irritated.',choices:[
+   {title:'Keep waiting',text:'Stress -5 / Gain Passive Buff [Well Fed]',apply:()=>{addStress(-5); addBuffToInventory('event_well_fed');}},
+   {title:'Go somewhere else',text:'Next building action costs 0 AP / Stress +5',stressDelta:5,apply:()=>{state.nextActionFree=true; addStress(5); log('Next building action costs 0 AP.');}},
+   {title:'Skip the meal',text:'Gold +30 / Stress +8',stressDelta:8,apply:()=>{state.gold+=30; addStress(8);}}
+  ]},
+  {code:'R3',title:'Shared Table Chat',text:'A stranger asks, "Is this seat taken?"',choices:[
+   {title:'Chat with them',text:'Stress -12',apply:()=>{addStress(-12);}},
+   {title:'Eat quietly',text:'Stress -6',apply:()=>{addStress(-6);}},
+   {title:'Ask a question while you are here',text:'Knowledge +15 / Stress -4',apply:()=>{gainKnowledge(15,'Shared Table Chat'); addStress(-4);}}
+  ]},
+  {code:'R4',title:'Secret Menu',text:'The owner says there is a dish today that is not on the menu.',choices:[
+   {title:'Try it',text:'Gold -50 / Gain 1 random wave Buff',apply:()=>{state.gold-=50; clampGold(); grantRandomBuff();}},
+   {title:'Too expensive',text:'Nothing happens',apply:()=>{}},
+   {title:'Take it to go',text:'Gold -70 / Gain 1 Legendary tactic item / Stress +5',stressDelta:5,apply:()=>{state.gold-=70; clampGold(); grantRandomTactic(t=>t.rarity==='legendary'); addStress(5);}}
+  ]}
+ ],
+ dorm:[
+  {code:'D1',title:'Scrolling Before Sleep',text:'You only wanted to check your phone for five minutes, but time slips away.',choices:[
+   {title:'Keep scrolling',text:'Gold +70 / Stress +15',stressDelta:15,apply:()=>{state.gold+=70; addStress(15);}},
+   {title:'Put it down immediately',text:'Stress -8',apply:()=>{addStress(-8);}},
+   {title:'Save some study materials',text:'Knowledge +15 / Stress +5',stressDelta:5,apply:()=>{gainKnowledge(15,'Scrolling Before Sleep'); addStress(5);}}
+  ]},
+  {code:'D2',title:'Cleaning the Room',text:'The messy desk is starting to bother you.',choices:[
+   {title:'Tidy up a little',text:'Stress -5',apply:()=>{addStress(-5);}},
+   {title:'Clean thoroughly',text:'Stress -12 / Next action reward -20%',apply:()=>{addStress(-12); state.nextActionRewardMul=(state.nextActionRewardMul||1)*0.80; log('Next action reward -20%.');}},
+   {title:'Find something old',text:'Gain 1 random Basic tactic item',apply:()=>{grantRandomTactic(t=>t.rarity==='basic');}}
+  ]},
+  {code:'D3',title:'Dream of Failure',text:'You dream that your inner demons are chasing you. You wake up with a tight chest.',choices:[
+   {title:'Go back to sleep',text:'Stress -8',apply:()=>{addStress(-8);}},
+   {title:'Write it down',text:'Knowledge +10 / Stress -5',apply:()=>{gainKnowledge(10,'Dream of Failure'); addStress(-5);}},
+   {title:'Force yourself to forget it',text:'Next wave grants 1 free tactic use / Stress +5',stressDelta:5,apply:()=>{mergeNextWaveMods({freeTacticSkill:1}); addStress(5);}}
+  ]},
+  {code:'D4',title:'Roommate Chat',text:'Your roommate casually asks, "Are you okay today?"',choices:[
+   {title:'Talk honestly',text:'Stress -12',apply:()=>{addStress(-12);}},
+   {title:'Say you are fine',text:'Stress -3',apply:()=>{addStress(-3);}},
+   {title:'Ask for help',text:'Gain Passive Buff [Emotional Buffer]',apply:()=>{addBuffToInventory('event_emotion_buffer');}}
+  ]}
+ ]
+};
+
+const MIND_EVENTS = [
+ {code:'M1',title:'Perfectionism',text:'A voice says, "It is still not good enough. A little more. A little more."',choices:[
+  {title:'Listen to it',text:'Next wave enemy HP +10% / Gain Gold +40 after clearing the next wave',apply:()=>mergeNextWaveMods({enemyHpMul:1.10,winGoldBonus:40})},
+  {title:'Argue back',text:'Stress -10 / Next wave tower fire rate -10%',apply:()=>{addStress(-10); mergeNextWaveMods({towerRateMul:.90});}},
+  {title:'Ignore it',text:'Nothing happens; if Stress is 70 or higher, Stress +5',stressDelta: state=>state.stress>=70?5:0,apply:()=>{if(state.stress>=70) addStress(5);}}
+ ]},
+ {code:'M2',title:'Self-doubt',text:'You suddenly feel that everything you have done so far is meaningless.',choices:[
+  {title:'Push through',text:'Next wave tower damage -10%',apply:()=>mergeNextWaveMods({towerDamageMul:.90})},
+  {title:'Spend time resetting yourself',text:'Stress -12 / Gold -40',apply:()=>{addStress(-12); state.gold-=40; clampGold();}},
+  {title:'Convince yourself',text:'Stress +5 / Next wave tower damage +10%',stressDelta:5,apply:()=>{addStress(5); mergeNextWaveMods({towerDamageMul:1.10});}}
+ ]},
+ {code:'M3',title:'Temptation to Procrastinate',text:'"Maybe put it aside for now? It probably will not matter that much."',choices:[
+  {title:'Accept procrastination',text:'AP +1 / Stress +15',stressDelta:15,apply:()=>{state.ap+=1; addStress(15);}},
+  {title:'Reject procrastination',text:'Stress -8',apply:()=>{addStress(-8);}},
+  {title:'Compromise',text:'Gold +30 / Stress +6',stressDelta:6,apply:()=>{state.gold+=30; addStress(6);}}
+ ]},
+ {code:'M4',title:'Emotional Backlash',text:'The emotions you pushed down during the day become something physical at night.',choices:[
+  {title:'Face it directly',text:'Next wave adds 1 elite enemy / Stress -15 after victory',apply:()=>mergeNextWaveMods({extraElite:1,winStressReduction:15})},
+  {title:'Hold it down for now',text:'Stress +8',stressDelta:8,apply:()=>{addStress(8);}},
+  {title:'Turn it into momentum',text:'Gain One-time Buff [Burst Focus] / Stress +10 after combat',apply:()=>{addBuffToInventory('event_burst_focus'); mergeNextWaveMods({endStressPenalty:10});}}
+ ]}
+];
+
+function getStressDelta(option){
+ if(typeof option.stressDelta === 'function') return option.stressDelta(state);
+ return option.stressDelta || 0;
+}
+function runEventOption(option, ctx, afterCb){
+ const exec = ()=>{ closeModal(); if(option.apply) option.apply(ctx||{}); updateAllUI(); if(state.stress < 100) afterCb(); };
+ const stressDelta = getStressDelta(option);
+ if(stressDelta > 0 && state.stress + stressDelta >= 100){
+  showModal('Stress Limit Warning', 'This choice will make Stress reach 100 or higher and cause an immediate failure. Continue?', [
+   {title:'Continue', primary:true, text:'Accept the stress risk', cb:exec},
+   {title:'Cancel', text:'Do not take this event choice', cb:()=>{closeModal(); afterCb();}}
+  ], '', '', 'event');
+ } else exec();
+}
+function showEventModal(event, ctx, afterCb, prefix='Event'){
+ showModal(`${prefix}: ${event.title}`, event.text, event.choices.map(opt=>({
+  title:opt.title, text:opt.text, primary:false, danger:getStressDelta(opt)>0 && state.stress+getStressDelta(opt)>=100, cb:()=>runEventOption(opt, ctx, afterCb)
+ })), `<div style="font-size:12px;color:#6b4a12;margin-top:8px;">${event.code || ''}</div>`, '', 'event');
+}
+function shouldTriggerBuildingEvent(buildingId){
+ return EVENT_BUILDINGS.has(buildingId) && Math.random() < (BUILDING_EVENT_PROB[buildingId] || 0);
+}
+function maybeShowMindEvent(ctx, afterCb){
+ if(state.mindEventTriggeredToday){ afterCb(); return; }
+ const fixed = state.day === 3 || state.day === 6;
+ const randomTriggered = !fixed && (ctx.actualApCost || 0) > 0 && Math.random() < .10;
+ if(!fixed && !randomTriggered){ afterCb(); return; }
+ state.mindEventTriggeredToday = true;
+ showEventModal(rand(MIND_EVENTS), ctx, afterCb, fixed ? 'Fixed Mind Event' : 'Mind Event');
+}
+function resolvePostActionEvents(buildingId, ctx){
+ const done = ()=>{ updateAllUI(); if(state.stress<100) showModal('Done', 'Action completed.', [{title:'OK', cb:closeModal}]); };
+ const afterBuilding = ()=>maybeShowMindEvent(ctx, done);
+ if(shouldTriggerBuildingEvent(buildingId)) showEventModal(rand(BUILDING_EVENTS[buildingId]), ctx, afterBuilding, 'Building Event');
+ else afterBuilding();
+}
+
+function doAction(apCost, effect, id, ctx={}){
  closeModal();
  progressThen(BUILDING_NAMES[id],()=>{
-   state.ap-=apCost; effect(); updateAllUI();
-   if(state.stress<100) showModal('Done', 'Action completed.', [{title:'OK', cb:closeModal}]);
+   const actualCost = (state.nextActionFree && apCost > 0) ? 0 : apCost;
+   if(state.nextActionFree && apCost > 0){ state.nextActionFree = false; log('Free building action used.'); }
+   state.ap-=actualCost;
+   effect(ctx);
+   ctx.buildingId = id;
+   ctx.actualApCost = actualCost;
+   ctx.originalApCost = apCost;
+   updateAllUI();
+   if(state.stress<100) resolvePostActionEvents(id, ctx);
  });
 }
 
@@ -819,30 +1569,189 @@ window.buyShopItem = function(kind, id) {
 
 function startBattle(){
  if(state.phase!=='deploy') return;
- state.effStress = Math.max(0, state.stress - state.tempStressReduction);
- state.waveMultipliers = calcWaveMultipliers(state.effStress);
- 
- state.phase='battle'; state.enemies=[]; state.projectiles=[]; state.fx=[]; state.combatTime=0;
- state.temp={towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false};
- 
+ state.phase='battle'; state.enemies=[]; state.projectiles=[]; state.fx=[]; state.combatTime=0; state.leaksThisWave=0; state.emotionBufferUsedThisWave=false;
+ state.temp={towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false, emotionBuffer:false};
+ state.currentWaveEventMods = {...defaultNextWaveMods(), ...(state.nextWaveMods || {})};
+ state.nextWaveMods = defaultNextWaveMods();
+
+ applyStartOfWaveTowerEffects();
  for(const bid of state.activeBuffIds){
   const b=buffById[bid];
-  if(b?.mods){ for(const [k,v] of Object.entries(b.mods)) state.temp[k]=v; }
+  if(b?.mods){ for(const [k,v] of Object.entries(b.mods)) applyTempMod(k,v); }
   if(b?.apply) b.apply();
  }
- if(state.stress>=100) return; // applied buff might have triggered game over
+ if(state.currentWaveEventMods.towerDamageMul) state.temp.towerDamage *= state.currentWaveEventMods.towerDamageMul;
+ if(state.currentWaveEventMods.towerRateMul) state.temp.towerRate *= state.currentWaveEventMods.towerRateMul;
+ if(state.currentWaveEventMods.freeTacticSkill){
+  state.freeTacticSkillCharges = (state.freeTacticSkillCharges || 0) + state.currentWaveEventMods.freeTacticSkill;
+  showToast(`Free tactical skill charges: ${state.freeTacticSkillCharges}`);
+ }
+ if(state.stress>=100) return; // applied tower/buff effect might have triggered game over
+
+ state.effStress = Math.max(0, state.stress - state.tempStressReduction);
+ state.waveMultipliers = calcWaveMultipliers(state.effStress);
+ if(state.currentWaveEventMods.enemyHpMul) state.waveMultipliers.hp *= state.currentWaveEventMods.enemyHpMul;
 
  const w=WAVES[state.wave-1]; const q=[];
- for(const [id,n] of w.list) for(let i=0;i<n;i++) q.push(id);
+ if(!state.waveRoutePlan || state.waveRoutePlan.wave !== state.wave){
+  state.waveRoutePlan = createWaveRoutePlan(state.wave, state.currentWaveEventMods || defaultNextWaveMods());
+ }
+ if(state.waveRoutePlan?.groups?.length){
+  state.waveRoutePlan.groups.forEach((g,routeIndex)=>{
+   g.entries.forEach(id=>q.push({id, routeIndex}));
+  });
+ } else {
+  const countMul = state.currentWaveEventMods.enemyCountMul || 1;
+  for(const [id,n] of w.list) for(let i=0;i<Math.max(1, Math.round(n*countMul));i++) q.push({id, routeIndex:null});
+  for(let i=0;i<(state.currentWaveEventMods.extraElite||0);i++) q.push({id:'numb', routeIndex:null});
+ }
+ shuffle(q);
  state.spawner = {queue:q, timer:.5, interval:w.interval};
- state.placedTowers.forEach(t=>{t.cool=0;t.disabled=0;});
+ state.placedTowers.forEach(t=>{t.cool=0;t.disabled=0;t.shotCount=0;t.lastTargetId=null;t.focusStacks=0;t.pulseCount=0;});
  beep(860,.12,'triangle'); updateAllUI();
 }
 
-function spawnEnemy(id){
- const def=ENEMIES[id]; const start=pickStartCell(); const path=findPath(start); if(!path) return;
+function makeEnemy(id, opts={}){
+ const def=ENEMIES[id];
+ if(!def) return null;
  const hp=Math.max(1, Math.round(def.hp * state.waveMultipliers.hp));
- state.enemies.push({id:Math.random().toString(36).slice(2),type:id,def,hp,maxHp:hp,x:path[0].x,y:path[0].y,path,pi:1,progress:0,slow:0,slowMul:1,stun:0,hitTimer:0});
+ const path = opts.path;
+ const pi = opts.pi ?? 1;
+ const startX = opts.x ?? path?.[0]?.x;
+ const startY = opts.y ?? path?.[0]?.y;
+ if(!path || startX == null || startY == null) return null;
+ const enemy = {
+  id:Math.random().toString(36).slice(2),type:id,def,hp,maxHp:hp,armor:def.armor||0,
+  x:startX,y:startY,path,pi,progress:opts.progress ?? (pi/path.length),
+  slow:0,rawSlowMul:1,slowMul:1,stun:0,hitTimer:0,vuln:0,vulnTimer:0,marked:false,knockCd:0,
+  shield:opts.shield||0, stealth:0, abilityCd:0, enraged:false
+ };
+ if(id==='rational') enemy.abilityCd = 6;
+ if(id==='noise') enemy.abilityCd = 8;
+ if(id==='avoid') enemy.abilityCd = 5;
+ if(id==='deadline') enemy.abilityCd = 20;
+ return enemy;
+}
+
+
+function spawnEnemy(entry){
+ const id = typeof entry === 'string' ? entry : entry?.id;
+ if(!id) return;
+ let path = null;
+ if(entry && typeof entry === 'object' && entry.routeIndex != null){
+  path = state.waveRoutePlan?.groups?.[entry.routeIndex]?.path || null;
+ }
+ if(!path){ const start=pickStartCell(); path=findPath(start); }
+ if(!path) return;
+ const enemy = makeEnemy(id,{path,x:path[0].x,y:path[0].y,pi:1,progress:0});
+ if(enemy) state.enemies.push(enemy);
+}
+
+function splitRepeatEnemy(parent){
+ if(!parent?.path || parent.type !== 'repeat') return;
+ const childCount = 2;
+ for(let i=0;i<childCount;i++){
+  const child = makeEnemy('smallThought',{
+   path:parent.path,
+   x:parent.x + (i===0 ? -8 : 8),
+   y:parent.y + (i===0 ? -4 : 4),
+   pi:Math.max(1, parent.pi || 1),
+   progress:parent.progress || 0
+  });
+  if(child){
+   // Split children continue from the parent's current position instead of restarting from the map entrance.
+   state.enemies.push(child);
+  }
+ }
+ state.fx.push({kind:'split',x:parent.x,y:parent.y,life:.55});
+ log('Repeat split into 2 Small Thoughts.');
+}
+
+function spawnEnemyFromParent(id, parent, i=0, total=1){
+ if(!parent?.path) return null;
+ const angle = total > 1 ? (Math.PI * 2 * i / total) : 0;
+ const offset = total > 1 ? 12 : 0;
+ const child = makeEnemy(id,{
+  path:parent.path,
+  x:parent.x + Math.cos(angle) * offset,
+  y:parent.y + Math.sin(angle) * offset,
+  pi:Math.max(1, parent.pi || 1),
+  progress:parent.progress || 0
+ });
+ if(child) state.enemies.push(child);
+ return child;
+}
+
+function addShieldToEnemy(e, amount){
+ e.shield = Math.max(0, (e.shield || 0) + amount);
+ e.hitTimer = Math.max(e.hitTimer || 0, .12);
+}
+
+function updateMonsterSpecials(e, logicDt){
+ if(e.type === 'rational'){
+  e.abilityCd -= logicDt;
+  if(e.abilityCd <= 0){
+   let count = 0;
+   for(const target of state.enemies){
+    if(dist(e,target) <= 1.5*C){ addShieldToEnemy(target, 30); count++; }
+   }
+   if(count>0) state.fx.push({kind:'shield',x:e.x,y:e.y,val:30,life:.65});
+   e.abilityCd += 6;
+  }
+ }
+ else if(e.type === 'noise'){
+  e.abilityCd -= logicDt;
+  if(e.abilityCd <= 0){
+   const candidates = state.placedTowers.filter(t=>(t.disabled||0)<=0);
+   if(candidates.length){
+    const target = candidates.sort((a,b)=>dist(e,a)-dist(e,b))[0];
+    target.disabled = Math.max(target.disabled || 0, 2);
+    target.cool = Math.max(target.cool || 0, .2);
+    state.fx.push({kind:'jam',x:target.x,y:target.y,life:.75});
+   }
+   e.abilityCd += 8;
+  }
+ }
+ else if(e.type === 'avoid'){
+  if(e.stealth > 0){
+   e.stealth -= logicDt;
+   if(e.stealth <= 0) e.stealth = 0;
+  } else {
+   e.abilityCd -= logicDt;
+   if(e.abilityCd <= 0){
+    e.stealth = 2;
+    e.abilityCd = 5;
+    state.fx.push({kind:'stealth',x:e.x,y:e.y,life:.6});
+   }
+  }
+ }
+ else if(e.type === 'deadline'){
+  if(!e.enraged && e.hp <= e.maxHp * .5){
+   e.enraged = true;
+   state.fx.push({kind:'rage',x:e.x,y:e.y,life:1.0});
+   log('Deadline entered low-HP reinforcement mode.');
+  }
+  e.abilityCd -= logicDt;
+  if(e.abilityCd <= 0){
+   const ids = ['thought','thought','thought','thought','urgency'];
+   ids.forEach((id,i)=>spawnEnemyFromParent(id,e,i,ids.length));
+   state.fx.push({kind:'summon',x:e.x,y:e.y,life:.9});
+   log('Deadline summoned 4 Thoughts and 1 Urgency.');
+   e.abilityCd = e.enraged ? 12 : 20;
+  }
+ }
+}
+
+function getEnemySpeedMultiplier(e){
+ let mul = 1;
+ if(e.type === 'urgency' && (e.progress || 0) >= .60) mul *= 1.20;
+ if(e.type === 'deadline' && e.enraged) mul *= 1.20;
+ return mul;
+}
+
+function canTowerTargetEnemy(tower, enemy){
+ if((enemy.stealth || 0) > 0 && tower?.def?.id !== 'insight_reader') return false;
+ return true;
 }
 
 function updateCombat(dt){
@@ -853,27 +1762,34 @@ function updateCombat(dt){
  }
  
  for(const e of [...state.enemies]){
-  if(e.slow>0){e.slow-=logicDt; if(e.slow<=0)e.slowMul=1;}
+  updateMonsterSpecials(e, logicDt);
+  if(e.slow>0){e.slow-=logicDt; if(e.slow<=0){e.rawSlowMul=1;e.slowMul=1;}}
+  if(e.vulnTimer>0){e.vulnTimer-=logicDt; if(e.vulnTimer<=0){e.vuln=0;e.marked=false;}}
+  if(e.knockCd>0) e.knockCd-=logicDt;
   if(e.stun>0){e.stun-=logicDt; continue;}
   if(e.hitTimer>0) e.hitTimer-=logicDt;
   if(e.pi>=e.path.length){ leakEnemy(e); continue; }
   
   const target=e.path[e.pi], dx=target.x-e.x, dy=target.y-e.y, d=Math.hypot(dx,dy);
-  const speed = e.def.speed * C * state.waveMultipliers.spd * state.temp.enemySpeed * e.slowMul;
+  const speed = e.def.speed * C * state.waveMultipliers.spd * state.temp.enemySpeed * getCurrentSlowMul(e) * getEnemySpeedMultiplier(e);
   const step = speed*logicDt;
-  if(d<=step){ e.x=target.x; e.y=target.y; e.pi++; e.progress=e.pi/e.path.length; if(e.pi>=e.path.length) leakEnemy(e); }
+  if(d<=step){ e.x=target.x; e.y=target.y; e.pi++; e.progress=e.pi/e.path.length; if(e.pi>=e.path.length) leakEnemy(e); else beep(200,.05,'sine',.015); }
   else { e.x+=dx/d*step; e.y+=dy/d*step; e.progress=(e.pi/e.path.length); }
  }
  
  for(const t of state.placedTowers){
+  if((t.disabled||0)>0){ t.disabled-=logicDt; if(t.disabled>0) continue; t.disabled=0; }
   t.cool-=logicDt;
   if(t.cool<=0){
-   const s={atk:t.def.atk*state.temp.towerDamage,rate:t.def.rate*state.temp.towerRate,range:t.def.range*state.temp.towerRange,aoe:t.def.aoe};
+   const s=getBuffedTowerStats(t);
    t.cool=1/Math.max(.1,s.rate);
-   const arr=state.enemies.filter(e=>dist(t,e)<=s.range*C);
+   const arr=state.enemies.filter(e=>dist(t,e)<=s.range*C && canTowerTargetEnemy(t,e));
    if(arr.length) {
-     const tar=arr[0];
-     state.projectiles.push({x:t.x,y:t.y,target:tar,damage:s.atk,aoe:s.aoe*C,speed:C*10,tower:t});
+     const shots = getProjectileCount(t);
+     for(let i=0;i<shots;i++){
+       const tar=arr[Math.min(i, arr.length-1)];
+       state.projectiles.push({x:t.x,y:t.y,target:tar,damage:s.atk,aoe:s.aoe*C,speed:C*10,tower:t});
+     }
      beep(720,.025,'triangle',.01);
    }
   }
@@ -883,8 +1799,8 @@ function updateCombat(dt){
   const target=p.target; if(!state.enemies.includes(target)){ state.projectiles=state.projectiles.filter(x=>x!==p); continue; }
   const d=dist(p,target), step=p.speed*logicDt;
   if(d<=step){
-   if(p.aoe>0){ for(const e of state.enemies) if(dist(target,e)<=p.aoe) damageEnemy(e,p.damage); }
-   else damageEnemy(target,p.damage);
+   if(p.aoe>0){ for(const e of [...state.enemies]) if(dist(target,e)<=p.aoe) applyTowerHit(p.tower,e,p.damage); }
+   else applyTowerHit(p.tower,target,p.damage);
    state.projectiles=state.projectiles.filter(x=>x!==p);
   }
   else { p.x+=(target.x-p.x)/d*step; p.y+=(target.y-p.y)/d*step; }
@@ -895,25 +1811,47 @@ function updateCombat(dt){
  updateAllUI(false);
 }
 
-function damageEnemy(e,dmg){
+function damageEnemy(e,dmg,sourceTower=null){
  if(!state.enemies.includes(e)) return;
- e.hp-=Math.max(1,dmg-(e.def.armor||0)); 
+ const armor = e.armor ?? (e.def.armor || 0);
+ const vulnMul = 1 + (e.vuln || 0);
+ let incoming = dmg * vulnMul;
+ // Shell: if one hit is lower than 10 damage, it receives an extra 30% reduction.
+ if(e.type === 'shell' && incoming < 10) incoming *= 0.70;
+ let finalDamage = Math.max(1, incoming - armor);
+ if((e.shield || 0) > 0){
+  const absorbed = Math.min(e.shield, finalDamage);
+  e.shield -= absorbed;
+  finalDamage -= absorbed;
+  if(absorbed>0) state.fx.push({kind:'shieldHit',x:e.x,y:e.y,val:Math.round(absorbed),life:.35});
+  if(finalDamage <= 0){ e.hitTimer = 0.2; return; }
+ }
+ e.hp-=finalDamage; 
  e.hitTimer = 0.2; // 0.2s 泛红
  if(e.hp<=0) {
     state.enemies=state.enemies.filter(x=>x!==e);
-    const drop = Math.max(1, Math.round(e.def.baseGold * state.waveMultipliers.gold));
-    if(drop>0) { state.gold+=drop; state.fx.push({kind:'coin',x:e.x,y:e.y,val:drop,life:1.0}); }
+    let drop = e.def.baseGold > 0 ? Math.max(1, Math.round(e.def.baseGold * state.waveMultipliers.gold)) : 0;
+    if(sourceTower?.def?.id === 'review_mark' && (sourceTower.level||0)>=1) drop += 1;
+    if(drop>0) { state.gold+=drop; state.fx.push({kind:'coin',x:e.x,y:e.y,val:drop,life:1.0}); beep(180,.08,'triangle',.02); }
     state.fx.push({kind:'smoke',x:e.x,y:e.y,life:0.4});
     beep(e.def.size==='large'?350:e.def.size==='mid'?520:700,.06,e.def.size==='large'?'square':'sine',.025);
     
+    if(e.def.special==='split') splitRepeatEnemy(e);
     if(e.def.special==='boss') endWave();
  }
 }
 
 function leakEnemy(e){
  if(!state.enemies.includes(e)) return;
+ state.leaksThisWave = (state.leaksThisWave || 0) + 1;
  state.enemies=state.enemies.filter(x=>x!==e);
- const leakStr = Math.max(1, Math.round(e.def.baseLeak * state.waveMultipliers.leak));
+ let leakStr = Math.max(1, Math.round(e.def.baseLeak * state.waveMultipliers.leak));
+ if(state.temp?.emotionBuffer && !state.emotionBufferUsedThisWave){
+   const reduced = Math.max(1, Math.round(leakStr * 0.5));
+   log(`Emotional Buffer: first leak stress ${leakStr} → ${reduced}`);
+   leakStr = reduced;
+   state.emotionBufferUsedThisWave = true;
+ }
  state.fx.push({kind:'coreHit',x:e.x,y:e.y,life:0.5}); beep(120,.25,'sawtooth',.05);
  addStress(leakStr); log(`Leaked Enemy: Stress +${leakStr}`);
 }
@@ -927,11 +1865,25 @@ canvas.addEventListener('click',evt=>{
    if(placed){ state.selectedPlaced=placed.uid; state.selectedTowerId=null; updateAllUI(); return; }
    if(cellMap[g.r]?.[g.c]==='tower' && state.selectedTowerId){
     if(state.placedTowers.some(t=>t.r===g.r&&t.c===g.c)) return;
-    if((state.towerInventory[state.selectedTowerId]||0)<=0) return showToast('Out of stock in inventory.');
+    if((state.towerInventory[state.selectedTowerId]||0)<=0){
+      const missingId = state.selectedTowerId;
+      state.selectedTowerId = null;
+      state.selectedPlaced = null;
+      updateAllUI();
+      return showToast('Out of stock in inventory. Please select another tower.');
+    }
     const def=towerById[state.selectedTowerId]; state.towerInventory[state.selectedTowerId]--;
     const p=centerOf(g.r,g.c);
     state.placedTowers.push({uid:Date.now(), id:def.id, def, r:g.r,c:g.c,x:p.x,y:p.y,level:0,cool:0});
+    // If this was the last copy, clear placement selection so the UI cannot get stuck
+    // in an out-of-stock tower state, which was most visible with Time Anchor Tower.
+    if((state.towerInventory[def.id]||0)<=0){
+      state.selectedTowerId=null;
+      state.selectedPlaced=null;
+    }
     beep(880,.08,'triangle'); updateAllUI();
+   } else {
+    state.selectedPlaced=null; state.selectedTowerId=null; updateAllUI();
    }
  }
 });
@@ -1074,13 +2026,13 @@ function useTactic(id){
   } else if(id==='tb2'){
     addStress(-6);
   } else if(id==='tr1' || id==='sticky_block'){
-    state.enemies.forEach(e=>{ e.slow = Math.max(e.slow, 5); e.slowMul = Math.min(e.slowMul, 0.55); });
+    state.enemies.forEach(e=>applySlow(e, 0.55, 5));
   } else if(id==='tr4'){
     addStress(-12);
   } else if(id==='tl1'){
     state.enemies.forEach(e=>{ e.stun = Math.max(e.stun, e.def.size==='boss' ? 2 : 4); });
   } else if(id==='clear_tasks'){
-    state.enemies.forEach(e=>{ e.hp -= 35; });
+    [...state.enemies].forEach(e=>damageEnemy(e, 35, null));
   } else if(id==='route_reconstruct'){
     state.enemies.forEach(e=>{
       e.pi = Math.max(1, e.pi - Math.ceil(e.path.length * 0.25));
@@ -1088,8 +2040,13 @@ function useTactic(id){
       if(target){ e.x = target.x; e.y = target.y; }
     });
   }
-  eq.used = true;
-  if(def.consume) delete state.tacticInventory[id];
+  if((state.freeTacticSkillCharges || 0) > 0){
+    state.freeTacticSkillCharges--;
+    log(`Free tactical skill used: ${def.name}`);
+  } else {
+    eq.used = true;
+    if(def.consume) delete state.tacticInventory[id];
+  }
   showToast(`${def.name} used.`);
   updateAllUI();
 }
@@ -1117,15 +2074,16 @@ function toggleTactic(id){
 }
 
 function openBuffTacticShop() {
+  const shopItems = getAvailableNightShopCatalog();
   const html = `<div style="font-weight:900;font-size:28px;text-align:center;color:#fff7dd;text-shadow:0 2px 10px rgba(0,0,0,.35);">Buff & Item Shop</div>
     <div style="font-size:14px;text-align:center;color:#fff5d2;margin:6px 0 16px;">Buy support items for tonight's defense.</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;max-height:58vh;overflow:auto;padding:6px;">
-      ${NIGHT_SHOP_CATALOG.map((item, index) => buildNightShopCard(item, index)).join('')}
+      ${shopItems.map((item, index) => buildNightShopCard(item, index)).join('')}
     </div>
     <div style="display:flex;justify-content:flex-end;margin-top:14px;"><button id="nightShopClose" class="ghost">Close</button></div>`;
   showModal('Buff & Item Shop', '', [], html, ASSETS.shopModal, 'shop');
   document.querySelectorAll('[data-shop-buy]').forEach(btn=>{
-    btn.onclick = ()=>buyNightShopItem(NIGHT_SHOP_CATALOG[Number(btn.dataset.shopBuy)]);
+    btn.onclick = ()=>buyNightShopItem(shopItems[Number(btn.dataset.shopBuy)]);
   });
   document.getElementById('nightShopClose').onclick = closeModal;
 }
@@ -1172,13 +2130,16 @@ function addStress(v) {
 function enterNight(){
  if(state.phase!=='day') return;
  const go = ()=>{
+   frequencySweep(600, 180, 1, 'triangle', 0.08);
    state.nightSnapshot = createSnapshot();
    state.phase='deploy';
    state.activeBuffIds=[];
    state.equippedTactics=[];
    state.selectedTowerId=null;
    state.selectedPlaced=null;
-   showToast('Entering Night Phase. Click the shop building for buffs and items.');
+   state.waveRoutePlan = createWaveRoutePlan(state.wave, state.nextWaveMods || defaultNextWaveMods());
+   state.selectedRouteIndex = null;
+   showToast('Entering Night Phase. Click a route group to preview its path. Click the shop building for buffs and items.');
    updateAllUI();
  };
  showRewardModal(`Nightfall Reward - ${DAYS[state.day-1]||'Sunday'}`, go);
@@ -1190,22 +2151,22 @@ function endWave(){
  state.enemies=[];
  state.projectiles=[];
  state.fx=[];
+ state.waveRoutePlan=null;
+ state.selectedRouteIndex=null;
  state.spawner=null;
- let postWaveReduce = 0;
- state.placedTowers.forEach(t=>{
-   if(t.def.special==='recover3') postWaveReduce += 3;
-   if(t.def.special==='recover4') postWaveReduce += 4;
- });
- if(postWaveReduce>0) {
-   addStress(-postWaveReduce);
-   log(`Rest Towers active: Stress -${postWaveReduce}`);
- }
+ const endEffects = applyEndOfWaveTowerEffects();
+ const waveEventMods = state.currentWaveEventMods || defaultNextWaveMods();
+ if(waveEventMods.winGoldBonus){ state.gold += waveEventMods.winGoldBonus; log(`Mind Event victory bonus: Gold +${waveEventMods.winGoldBonus}`); }
+ if(waveEventMods.winStressReduction){ addStress(-waveEventMods.winStressReduction); log(`Mind Event victory bonus: Stress -${waveEventMods.winStressReduction}`); }
+ if(waveEventMods.endStressPenalty){ addStress(waveEventMods.endStressPenalty); log(`Mind Event aftereffect: Stress +${waveEventMods.endStressPenalty}`); }
+ state.currentWaveEventMods = defaultNextWaveMods();
  state.tempStressReduction = 0;
- state.ap = 3;
- for(const bid of [...state.activeBuffIds]){
+ state.ap = 3 + (endEffects.apBonus || 0);
+ for(let i = state.activeBuffIds.length - 1; i >= 0; i--){
+   const bid = state.activeBuffIds[i];
    if(buffById[bid]?.kind === 'One-time'){
      delete state.buffInventory[bid];
-     state.activeBuffIds = state.activeBuffIds.filter(x=>x!==bid);
+     state.activeBuffIds.splice(i, 1);
    }
  }
  if(state.day >= 7){
@@ -1219,14 +2180,49 @@ function endWave(){
    state.day++;
    state.wave++;
    state.phase='day';
+   state.mindEventTriggeredToday = false;
    state.daySnapshot = createSnapshot();
    updateAllUI();
    showModal(`Start of ${DAYS[state.day-1]||'Sunday'}`, 'A new daytime begins.', [{title:'Start Day', primary:true, cb:closeModal}]);
  });
 }
 
+function updateCharacterStatusPanel(){
+ const img = document.getElementById('sideCharacterImg');
+ if(img){ img.src = playerSrc; img.style.display = ''; }
+ const nameEl = document.getElementById('sideCharacterName');
+ if(nameEl) nameEl.textContent = playerName || 'Character';
+ syncLevelFromExp('knowledge');
+ syncLevelFromExp('work');
+ const knowLv = state?.knowledgeLv || 1;
+ const workLv = state?.workLv || 1;
+ const knowExp = state?.knowledge || 0;
+ const workExp = state?.work || 0;
+ const knowLvEl = document.getElementById('sideKnowledgeLv');
+ if(knowLvEl) knowLvEl.textContent = knowLv;
+ const workLvEl = document.getElementById('sideWorkLv');
+ if(workLvEl) workLvEl.textContent = workLv;
+ const kp = expProgress(knowExp, knowLv, 'knowledge');
+ const wp = expProgress(workExp, workLv, 'work');
+ const kText = document.getElementById('sideKnowledgeExpText');
+ if(kText) kText.textContent = kp.max ? 'Max' : `${kp.current} / ${kp.need}`;
+ const kFill = document.getElementById('sideKnowledgeExpFill');
+ if(kFill) kFill.style.width = kp.pct + '%';
+ const kRemain = document.getElementById('sideKnowledgeRemain');
+ if(kRemain) kRemain.textContent = kp.max ? 'Max Lv: tower +3 unlocked' : `Next Lv: ${kp.remain} left`;
+ const wText = document.getElementById('sideWorkExpText');
+ if(wText) wText.textContent = wp.max ? 'Max' : `${wp.current} / ${wp.need}`;
+ const wFill = document.getElementById('sideWorkExpFill');
+ if(wFill) wFill.style.width = wp.pct + '%';
+ const wRemain = document.getElementById('sideWorkRemain');
+ if(wRemain) wRemain.textContent = wp.max ? 'Max Lv' : `Next Lv: ${wp.remain} left`;
+ const restLvEl = document.getElementById('sideRestaurantLv');
+ if(restLvEl) restLvEl.textContent = state?.restaurantLv || 1;
+}
+
 function updateAllUI(lists=true){
  if(!state) return;
+ updateCharacterStatusPanel();
  document.getElementById('hudDay').textContent = DAYS[state.day-1] || 'Sunday';
  document.getElementById('hudGold').textContent = Math.round(state.gold);
  document.getElementById('hudAP').textContent = state.ap;
@@ -1251,8 +2247,11 @@ function updateAllUI(lists=true){
  document.getElementById('startBattleBtn').classList.toggle('hidden', state.phase==='battle');
  const wInfo=document.getElementById('waveInfoLeft');
  if((state.phase==='deploy' || state.phase==='battle') && WAVES[state.wave-1]){
-   wInfo.innerHTML = `<b>Wave ${state.wave} Enemies:</b><br>` + WAVES[state.wave-1].list.map(([id,n])=>`<div class="wave-sidebar-item"><img src="${ENEMY_IMGS[id]}"><span>${ENEMIES[id].name} ×${n}</span></div>`).join('');
- } else wInfo.innerHTML='';
+   wInfo.innerHTML = renderWaveRouteInfo();
+ } else {
+   wInfo.innerHTML='';
+   state.selectedRouteIndex = null;
+ }
  const bInfo=document.getElementById('battleInfo');
  if(state.phase==='battle'){
    const eff = state.effStress, m = state.waveMultipliers;
@@ -1266,7 +2265,7 @@ function updateAllUI(lists=true){
      shopSec.classList.remove('hidden');
      const nsGrid = document.getElementById('nightShopGrid');
      nsGrid.innerHTML = '';
-     TOWERS.forEach(t=>{
+     getAvailableTowerShopItems().forEach(t=>{
        const div=document.createElement('div');
        div.className='item';
        const disabled = state.gold<t.price?'disabled':'';
@@ -1289,12 +2288,27 @@ function updateAllUI(lists=true){
    if(!selT) insp.innerHTML='Click a placed tower on the map.';
    else {
      const u=selT.def.up[selT.level];
-     const canUp = u && state.gold >= u[0];
-     insp.innerHTML=`<b>${selT.def.name}</b> +${selT.level}<br><div class="btns">${u?`<button class="primary" id="upBtn" ${canUp?'':'disabled'}>Upgrade (${u[0]} G)</button>`:''}<button class="danger ghost" id="sellBtn">Demolish</button></div>`;
-     if(u) document.getElementById('upBtn').onclick=()=>{ if(canUp){state.gold-=u[0];selT.level++;updateAllUI();} };
+     const upgradeCap = getTowerUpgradeCap();
+     const nextUpgradeLevel = selT.level + 1;
+     const knowledgeLocked = !!u && nextUpgradeLevel > upgradeCap;
+     const needKnowLv = requiredKnowledgeLvForUpgrade(nextUpgradeLevel);
+     const canUp = u && !knowledgeLocked && state.gold >= u[0];
+     // 当前能力信息
+     const stats = getBuffedTowerStats(selT);
+     const aura = getSupportAuraBonuses(selT);
+     const auraText = aura.rateMul>1 || aura.rangeBonus>0 ? `<div style="color:#0f766e;">Aura: SPD x${fmtStat(aura.rateMul)}, RNG +${fmtStat(aura.rangeBonus)}</div>` : '';
+     const capText = `<div style="color:#6b7280;">Knowledge Lv ${state.knowledgeLv||1}: tower upgrade cap +${upgradeCap}</div>`;
+     const currentStats = `<div style="font-size:11px;color:#666;margin-bottom:8px;"><div><b>Current Stats:</b></div><div>ATK: ${fmtStat(stats.atk)}</div><div>SPD: ${fmtStat(stats.rate)}</div><div>RNG: ${fmtStat(stats.range)}</div><div>AOE: ${fmtStat(stats.aoe)}</div>${auraText}${capText}<div style="margin-top:4px;line-height:1.4;"><i>${selT.def.desc}</i></div></div>`;
+     // 升级信息
+     const lockText = knowledgeLocked ? `<div style="color:#dc2626;margin-top:4px;">Need Knowledge Lv ${needKnowLv} to upgrade to +${nextUpgradeLevel}</div>` : '';
+     const upgradeInfo = u ? `<div style="font-size:11px;background:rgba(255,200,87,0.1);padding:8px;border-radius:6px;margin-bottom:8px;"><div><b>Next Upgrade:</b></div><div style="color:#d9a000;margin-top:4px;line-height:1.4;"><b>${u[1]}</b></div>${lockText}</div>` : '<div style="font-size:11px;color:#999;margin-bottom:8px;">Max level reached</div>';
+
+     insp.innerHTML=`<div style="font-size:14px;font-weight:bold;margin-bottom:8px;">${selT.def.name} <span style="color:#ffc857;">+${selT.level}</span></div>${currentStats}${upgradeInfo}<div class="btns">${u?`<button class="primary" id="upBtn" style="width:100%;" ${canUp?'':'disabled'}>${knowledgeLocked ? `🔒 Need Knowledge Lv ${needKnowLv}` : `⬆ Upgrade (${u[0]} G)`}</button>`:''}<button class="danger ghost" id="sellBtn" style="width:100%;">🗑 Demolish</button></div>`;
+     if(u) document.getElementById('upBtn').onclick=()=>{ if(canUp){state.gold-=u[0];selT.level++;beep(980,.08,'triangle');updateAllUI();} };
      document.getElementById('sellBtn').onclick=()=>{ state.gold+=Math.round(selT.def.price*.5); state.placedTowers=state.placedTowers.filter(x=>x.uid!==selT.uid); state.selectedPlaced=null; updateAllUI(); };
    }
  }
+ updateNearPrompt();
 }
 
 document.getElementById('restartBtn').onclick=()=>showModal('Restart', 'Choose where to restart.', [
@@ -1328,16 +2342,19 @@ function draw(){
     }
    }
    ctx.restore();
+   drawSelectedRouteOverlay();
    const sel=state.placedTowers.find(x=>x.uid===state.selectedPlaced);
    if(sel){
     ctx.save(); ctx.fillStyle='rgba(125,223,242,.13)'; ctx.strokeStyle='rgba(125,223,242,.95)'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(sel.x,sel.y,(sel.def.range||0)*C,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
+    const selStats = getBuffedTowerStats(sel);
+    ctx.beginPath(); ctx.arc(sel.x,sel.y,(selStats.range||0)*C,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
    }
    for(const t of state.placedTowers){
     ctx.save(); const img=getImg(TOWER_IMGS[t.def.id]);
     if(img.complete) ctx.drawImage(img, t.x-32, t.y-32, 64, 64);
     else { ctx.fillStyle='rgba(123,223,242,0.5)'; ctx.beginPath(); ctx.arc(t.x,t.y,16,0,Math.PI*2); ctx.fill(); }
-    if(t.level){ctx.fillStyle='#000';ctx.font='bold 14px sans-serif';ctx.fillText('+'+t.level,t.x+12,t.y-12);}
+    if(t.level){ctx.fillStyle='#fff';ctx.font='bold 14px sans-serif';ctx.fillText('+'+t.level,t.x+12,t.y-12);}
+    if((t.disabled||0)>0){ctx.fillStyle='rgba(30,41,59,.60)';ctx.beginPath();ctx.arc(t.x,t.y,29,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fbbf24';ctx.font='bold 13px sans-serif';ctx.fillText('JAM',t.x-14,t.y+4);}
     ctx.restore();
    }
 
@@ -1349,11 +2366,19 @@ function draw(){
     const imgPath = ENEMY_IMGS[imgKey];
     const img = getImg(imgPath);
     const size = e.def.size === 'boss' ? 80 : e.def.size === 'large' ? 64 : 48;
+    if((e.stealth||0)>0) ctx.globalAlpha = 0.38;
     if (img.complete) ctx.drawImage(img, e.x - size / 2, e.y - size / 2, size, size);
+    ctx.globalAlpha = 1;
     
     const w=34,h=6, pct=clamp(e.hp/e.maxHp,0,1);
     ctx.fillStyle='red'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w,h); ctx.fillStyle='#55e07a'; ctx.fillRect(e.x-w/2,e.y-size/2-10,w*pct,h);
-    ctx.strokeStyle='black'; ctx.strokeRect(e.x-w/2,e.y-size/2-10,w,h); ctx.restore();
+    ctx.strokeStyle='black'; ctx.strokeRect(e.x-w/2,e.y-size/2-10,w,h);
+    if((e.shield||0)>0){ctx.fillStyle='#60a5fa';ctx.font='bold 10px sans-serif';ctx.fillText('SH '+Math.round(e.shield),e.x-w/2,e.y-size/2-22);}
+    if((e.armor||0)>0){ctx.fillStyle='#bfdbfe';ctx.font='bold 10px sans-serif';ctx.fillText('AR '+e.armor,e.x-w/2,e.y-size/2-14);}
+    if((e.stealth||0)>0){ctx.fillStyle='#c084fc';ctx.font='bold 10px sans-serif';ctx.fillText('HIDE',e.x+w/2+3,e.y-size/2-14);}
+    if(e.marked){ctx.fillStyle='#facc15';ctx.font='bold 13px sans-serif';ctx.fillText('◆',e.x+w/2+4,e.y-size/2-2);}
+    if(e.enraged){ctx.fillStyle='#fb7185';ctx.font='bold 10px sans-serif';ctx.fillText('RAGE',e.x-w/2,e.y+size/2+10);}
+    ctx.restore();
    }
    for(const p of state.projectiles){ ctx.save(); ctx.fillStyle='#ffc857';ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();ctx.restore(); }
  } else {
@@ -1366,6 +2391,14 @@ function draw(){
   if(f.kind==='coin'){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#ffc857';ctx.font='bold 20px sans-serif';ctx.fillText('+'+f.val,f.x,f.y-(1-f.life)*28);}
   if(f.kind==='smoke'){ctx.globalAlpha=clamp(f.life/.4,0,1);ctx.fillStyle='rgba(210,240,255,.5)';ctx.beginPath();ctx.arc(f.x,f.y,25*(1-f.life/.4),0,Math.PI*2);ctx.fill();}
   if(f.kind==='coreHit'){ctx.globalAlpha=clamp(f.life/.5,0,1);ctx.strokeStyle='rgba(255,80,80,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y,40*(1-f.life/.5),0,Math.PI*2);ctx.stroke();}
+  if(f.kind==='armorBreak'){ctx.globalAlpha=clamp(f.life/.55,0,1);ctx.fillStyle='#93c5fd';ctx.font='bold 16px sans-serif';ctx.fillText('ARM -'+f.val,f.x-18,f.y-24*(1-f.life/.55));}
+  if(f.kind==='split'){ctx.globalAlpha=clamp(f.life/.55,0,1);ctx.fillStyle='#fbbf24';ctx.font='bold 16px sans-serif';ctx.fillText('SPLIT!',f.x-24,f.y-28*(1-f.life/.55));}
+  if(f.kind==='shield'){ctx.globalAlpha=clamp(f.life/.65,0,1);ctx.fillStyle='#60a5fa';ctx.font='bold 15px sans-serif';ctx.fillText('SH +'+f.val,f.x-22,f.y-30*(1-f.life/.65));}
+  if(f.kind==='shieldHit'){ctx.globalAlpha=clamp(f.life/.35,0,1);ctx.fillStyle='#93c5fd';ctx.font='bold 13px sans-serif';ctx.fillText('-SH '+f.val,f.x-20,f.y-18*(1-f.life/.35));}
+  if(f.kind==='jam'){ctx.globalAlpha=clamp(f.life/.75,0,1);ctx.fillStyle='#fbbf24';ctx.font='bold 15px sans-serif';ctx.fillText('JAM!',f.x-18,f.y-28*(1-f.life/.75));}
+  if(f.kind==='stealth'){ctx.globalAlpha=clamp(f.life/.6,0,1);ctx.fillStyle='#c084fc';ctx.font='bold 15px sans-serif';ctx.fillText('HIDE',f.x-20,f.y-26*(1-f.life/.6));}
+  if(f.kind==='summon'){ctx.globalAlpha=clamp(f.life/.9,0,1);ctx.fillStyle='#fb923c';ctx.font='bold 15px sans-serif';ctx.fillText('SUMMON',f.x-34,f.y-32*(1-f.life/.9));}
+  if(f.kind==='rage'){ctx.globalAlpha=clamp(f.life,0,1);ctx.fillStyle='#fb7185';ctx.font='bold 18px sans-serif';ctx.fillText('RAGE!',f.x-28,f.y-36*(1-f.life));}
   ctx.restore();
  }
 }
