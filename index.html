@@ -303,8 +303,8 @@ canvas{display:block;image-rendering:auto; border-radius: 8px; box-shadow: 0 0 2
         </div>
       
         <div class="card">
-          <h3 style="margin:0 0 10px; font-size:14px;">Placed Tower Details</h3>
-          <div id="towerInspector" class="inspector">Click a tower on the map to inspect.</div>
+          <h3 style="margin:0 0 10px; font-size:14px;">Tower Details</h3>
+          <div id="towerInspector" class="inspector">Click a placed tower or a tower in the shop to inspect.</div>
         </div>
 
         <div class="card">
@@ -1244,7 +1244,7 @@ function newGame(){
   knowledge:0, knowledgeLv:1, work:0, workLv:1, restaurantLv:1,
   towerInventory:{}, buffInventory:{}, tacticInventory:{}, 
   activeBuffIds:[], equippedTactics:[], tacticSlots:1, buffSlots:1,
-  placedTowers:[], selectedTowerId:null, selectedPlaced:null, placementMode:null,
+  placedTowers:[], selectedTowerId:null, selectedPlaced:null, selectedShopTowerId:null, placementMode:null,
   enemies:[], projectiles:[], fx:[], blockers:[], spawner:null, combatTime:0, timeScale:1, 
   waveMultipliers: {hp:1, spd:1, gold:1, leak:1}, effStress: 0,
   temp:{towerRate:1, towerDamage:1, towerRange:1, enemySpeed:1, lastBreath:false, upgradeDiscount:false, emotionBuffer:false},
@@ -1924,13 +1924,14 @@ canvas.addEventListener('click',evt=>{
  if(state.phase==='deploy' || state.phase==='battle'){
    if(cellMap[g.r]?.[g.c]==='商店' && state.phase==='deploy') return openBuffTacticShop();
    const placed=state.placedTowers.find(t=>t.r===g.r&&t.c===g.c);
-   if(placed){ state.selectedPlaced=placed.uid; state.selectedTowerId=null; updateAllUI(); return; }
+   if(placed){ state.selectedPlaced=placed.uid; state.selectedTowerId=null; state.selectedShopTowerId=null; updateAllUI(); return; }
    if(cellMap[g.r]?.[g.c]==='tower' && state.selectedTowerId){
     if(state.placedTowers.some(t=>t.r===g.r&&t.c===g.c)) return;
     if((state.towerInventory[state.selectedTowerId]||0)<=0){
       const missingId = state.selectedTowerId;
       state.selectedTowerId = null;
       state.selectedPlaced = null;
+      state.selectedShopTowerId = null;
       updateAllUI();
       return showToast('Out of stock in inventory. Please select another tower.');
     }
@@ -1942,10 +1943,11 @@ canvas.addEventListener('click',evt=>{
     if((state.towerInventory[def.id]||0)<=0){
       state.selectedTowerId=null;
       state.selectedPlaced=null;
+      state.selectedShopTowerId=null;
     }
     beep(880,.08,'triangle'); updateAllUI();
    } else {
-    state.selectedPlaced=null; state.selectedTowerId=null; updateAllUI();
+    state.selectedPlaced=null; state.selectedTowerId=null; state.selectedShopTowerId=null; updateAllUI();
    }
  }
 });
@@ -1968,7 +1970,7 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>setTab(t.dataset.tab)
 document.querySelectorAll('.speedGroup button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.speedGroup button').forEach(btn=>btn.classList.remove('active')); b.classList.add('active'); state.timeScale=+b.dataset.speed; });
 
 document.getElementById('startBattleBtn').onclick=startBattle;
-document.getElementById('cancelBtn').onclick=()=>{state.selectedTowerId=null;state.selectedPlaced=null;updateAllUI();};
+document.getElementById('cancelBtn').onclick=()=>{state.selectedTowerId=null;state.selectedPlaced=null;state.selectedShopTowerId=null;updateAllUI();};
 document.getElementById('restartBtn').onclick=()=>showModal('Restart Game','Are you sure?',[{title:'Confirm',cb:()=>{closeModal();newGame();}},{title:'Cancel',cb:closeModal}]);
 document.getElementById('audioBtn').onclick=()=>{audio.on=!audio.on;document.getElementById('audioBtn').textContent=audio.on?'🔊':'🔇';};
 document.getElementById('buyBuffSlot').onclick=()=>{if(state.buffSlots>=3||state.gold<50)return showToast('Maxed or lacking gold.'); state.gold-=50; state.buffSlots++; updateAllUI();};
@@ -2037,7 +2039,9 @@ function renderInventories(){
     const div=document.createElement('div');
     div.className='item'+(state.selectedTowerId===id?' selected':'');
     div.innerHTML=`<div class="item-content"><img src="${TOWER_IMGS[d.id]||''}" class="item-img"><div class="item-info"><div class="head"><b>${d.name} ×${n}</b>${badge(d.rarity)}</div><div class="item-stats"><span>ATK: ${d.atk}</span><span>SPD: ${d.rate}</span><span>RNG: ${d.range}</span></div></div></div><button class="primary" style="margin-top:6px">Select to Place</button>`;
-    div.querySelector('button').onclick=()=>{state.selectedTowerId=id;state.selectedPlaced=null;updateAllUI();};
+    div.style.cursor='pointer';
+    div.onclick=()=>{state.selectedTowerId=null;state.selectedShopTowerId=id;state.selectedPlaced=null;updateAllUI();};
+    div.querySelector('button').onclick=(ev)=>{ev.stopPropagation();state.selectedTowerId=id;state.selectedShopTowerId=id;state.selectedPlaced=null;updateAllUI();};
     ti.appendChild(div);
   }
 
@@ -2330,13 +2334,19 @@ function updateAllUI(lists=true){
      nsGrid.innerHTML = '';
      getAvailableTowerShopItems().forEach(t=>{
        const div=document.createElement('div');
-       div.className='item';
+       div.className='item'+(state.selectedShopTowerId===t.id?' selected':'');
+       div.style.cursor='pointer';
        const disabled = state.gold<t.price?'disabled':'';
-       div.innerHTML=`<div class="head"><b>${t.name}</b>${badge(t.rarity)}</div><button class="primary" style="margin-top:6px;" ${disabled}>Buy (${t.price}G)</button>`;
-       div.querySelector('button').onclick=()=>{
+       div.innerHTML=`<div class="head"><b>${t.name}</b>${badge(t.rarity)}</div><div style="font-size:10px;color:#6b7280;margin:3px 0 5px;">Click name/card to view details</div><button class="primary" style="margin-top:6px;" ${disabled}>Buy (${t.price}G)</button>`;
+       div.onclick=()=>{state.selectedTowerId=null;state.selectedShopTowerId=t.id;state.selectedPlaced=null;updateAllUI();};
+       div.querySelector('button').onclick=(ev)=>{
+         ev.stopPropagation();
          if(state.gold<t.price) return showToast('Not enough gold.');
          state.gold-=t.price;
          addTowerToInventory(t.id);
+         state.selectedTowerId=null;
+         state.selectedShopTowerId=t.id;
+         state.selectedPlaced=null;
          beep(1200,.09,'triangle');
          updateAllUI();
          showPurchaseSuccess(t.name, t.price);
@@ -2348,7 +2358,26 @@ function updateAllUI(lists=true){
    }
    const insp=document.getElementById('towerInspector');
    const selT=state.placedTowers.find(x=>x.uid===state.selectedPlaced);
-   if(!selT) insp.innerHTML='Click a placed tower on the map.';
+   const shopDef = !selT && state.selectedShopTowerId ? towerById[state.selectedShopTowerId] : null;
+   if(!selT && !shopDef) insp.innerHTML='Click a placed tower on the map, or click a tower in the shop.';
+   else if(shopDef) {
+     const stats = getTowerStats({def:shopDef, id:shopDef.id, level:0});
+     const sourceLabel = (state.towerInventory[shopDef.id]||0)>0 ? 'Inventory / Tower Shop' : 'Night Tower Shop';
+     const upgradeRows = (shopDef.up || []).length ? (shopDef.up || []).map((u,i)=>{
+       const needLv = requiredKnowledgeLvForUpgrade(i+1);
+       return '<div style="padding:5px 0;border-top:1px solid rgba(0,0,0,.08);"><b>+'+(i+1)+'</b> · '+u[1]+' <span style="color:#7c2d12;">('+u[0]+' G, needs Knowledge Lv '+needLv+')</span></div>';
+     }).join('') : '<div style="color:#777;">No upgrades.</div>';
+     insp.innerHTML = '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;">'
+       + '<img src="'+(TOWER_IMGS[shopDef.id]||'')+'" style="width:48px;height:48px;object-fit:contain;background:rgba(0,0,0,.05);border-radius:10px;padding:4px;" onerror="this.style.opacity=\'0.25\'">'
+       + '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:900;line-height:1.2;">'+shopDef.name+'</div>'
+       + '<div style="font-size:11px;color:#6b7280;margin-top:3px;">'+sourceLabel+' · '+(RARITY[shopDef.rarity]||shopDef.rarity)+' · Price '+shopDef.price+' G</div></div></div>'
+       + '<div style="font-size:11px;color:#444;line-height:1.45;margin-bottom:8px;">'+shopDef.desc+'</div>'
+       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;margin-bottom:8px;">'
+       + '<div><b>ATK:</b> '+fmtStat(stats.atk)+'</div><div><b>SPD:</b> '+fmtStat(stats.rate)+'</div>'
+       + '<div><b>RNG:</b> '+fmtStat(stats.range)+'</div><div><b>AOE:</b> '+fmtStat(stats.aoe)+'</div></div>'
+       + '<div style="font-size:11px;background:rgba(255,200,87,0.1);padding:8px;border-radius:8px;">'
+       + '<div style="font-weight:900;margin-bottom:4px;">Upgrade Preview</div>'+upgradeRows+'</div>';
+   }
    else {
      const u=selT.def.up[selT.level];
      const upgradeCap = getTowerUpgradeCap();
