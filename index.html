@@ -378,7 +378,6 @@ const TOWER_IMGS = {
   'archive_storm': '怪&塔/罕见塔/归档风暴塔.png',
   'calm_spray': '怪&塔/基础塔/冷静喷雾塔.png',
   'breath_beat': '怪&塔/稀有塔/呼吸节拍塔.png',
-  'time_anchor': '怪&塔/罕见塔/时间锚定塔.png',
   'arc_link': '怪&塔/基础塔/连接电弧塔.png',
   'support_hotline': '怪&塔/稀有塔/支援热线塔.png',
   'resonance_net': '怪&塔/罕见塔/共振网络塔.png',
@@ -611,11 +610,24 @@ function ensureWaveRoutePlan(mods=null){
   return state.waveRoutePlan;
 }
 function selectWaveRoute(index){
+  index = Number(index);
   if(!state?.waveRoutePlan?.groups?.[index]) return;
-  state.selectedRouteIndex = state.selectedRouteIndex === index ? null : index;
+  state.selectedRouteIndex = Number(state.selectedRouteIndex) === index ? null : index;
   updateAllUI(false);
+  // Force an immediate redraw so a cancelled route disappears right away,
+  // even before the next animation frame.
+  if(typeof draw === 'function') draw();
 }
 window.selectWaveRoute = selectWaveRoute;
+function bindRouteGroupHandlers(){
+  document.querySelectorAll('[data-route-index]').forEach(el=>{
+    el.onclick = (ev)=>{
+      ev.preventDefault();
+      ev.stopPropagation();
+      selectWaveRoute(el.getAttribute('data-route-index'));
+    };
+  });
+}
 function renderWaveRouteInfo(){
   const plan = ensureWaveRoutePlan(state.phase === 'battle' ? state.currentWaveEventMods : state.nextWaveMods);
   if(!plan?.groups?.length) return '<span>No route preview available.</span>';
@@ -623,8 +635,8 @@ function renderWaveRouteInfo(){
   const diff = getCurrentDifficultySetting();
   return `<b>Wave ${state.wave} Enemies by Route:</b><br><span style="font-size:11px;color:#6b7280;">${diff.label} · Thought HP x${getWaveEnemyHpMultiplier('thought', state.wave)} · Other HP x${getWaveEnemyHpMultiplier('urgency', state.wave)}</span><br>` + plan.groups.map((g,i)=>{
     const chips = Object.entries(g.counts).map(([id,n])=>`<span class="route-enemy-chip"><img src="${ENEMY_IMGS[id]}"><span>${ENEMIES[id]?.name || id} ×${n}</span></span>`).join('');
-    const label = selected === i ? 'shown on map' : 'click to preview';
-    return `<div class="route-group ${selected===i?'selected':''}" onclick="selectWaveRoute(${i})"><div class="route-title"><span>${g.name}</span><span>${label}</span></div><div class="route-enemies">${chips}</div></div>`;
+    const label = Number(selected) === i ? 'shown on map · click again to hide' : 'click to preview';
+    return `<div class="route-group ${Number(selected)===i?'selected':''}" data-route-index="${i}" title="Click to ${Number(selected)===i?'hide':'preview'} this route"><div class="route-title"><span>${g.name}</span><span>${label}</span></div><div class="route-enemies">${chips}</div></div>`;
   }).join('');
 }
 function drawPathLine(path){
@@ -703,7 +715,6 @@ const TOWERS = [
  {id:'archive_storm',name:'Archive Storm',rarity:'legendary',price:145,stress:35,atk:100,rate:.65,range:4.5,aoe:2.0,desc:'Standard AoE explosion.',up:[[75,'ATK +50'],[120,'RNG +3'],[165,'AOE +0.5']]},
  {id:'calm_spray',name:'Calm Spray Tower',rarity:'basic',price:40,stress:12,atk:4,rate:1.2,range:3.4,aoe:0,desc:'Slows enemy by 25%.',up:[[20,'Slow to 50%'],[35,'Duration +0.5s'],[55,'SPD +1, RNG +3']]},
  {id:'breath_beat',name:'Breath Beat Tower',rarity:'rare',price:80,stress:22,atk:3,rate:1.0,range:3.5,aoe:1.0,desc:'AoE slowing pulse.',up:[[40,'AOE +0.5'],[65,'Slow to 50%'],[90,'Stun every 3rd pulse']]},
- {id:'time_anchor',name:'Time Anchor Tower',rarity:'legendary',price:135,stress:35,atk:5,rate:0.8,range:3.7,aoe:0.8,desc:'Freeze enemies periodically.',up:[[70,'Freeze +0.2s'],[110,'Freeze +0.2s'],[150,'SPD +0.2']]},
  {id:'arc_link',name:'Arc Link Tower',rarity:'basic',price:55,stress:12,atk:10,rate:1.0,range:3.2,aoe:0,desc:'Attacks chain to nearby enemies.',up:[[30,'ATK +4'],[50,'Chain +1 target'],[70,'SPD +1']]},
  {id:'support_hotline',name:'Support Hotline',rarity:'rare',price:90,stress:22,atk:8,rate:1.1,range:3.3,aoe:0,desc:'Boost nearby tower SPD.',up:[[50,'SPD +2'],[80,'Boost RNG +1'],[110,'Boost SPD +50%']]},
  {id:'resonance_net',name:'Resonance Net',rarity:'legendary',price:150,stress:35,atk:13,rate:3.0,range:3.4,aoe:0,desc:'Boost DMG per active buff.',up:[[80,'ATK +10'],[125,'Buff DMG +100%'],[175,'Buff DMG +150%']]},
@@ -735,7 +746,6 @@ const TOWER_UPGRADE_STAT_EFFECTS = {
  archive_storm:[{atk:50},{range:3},{aoe:.5}],
  calm_spray:[{},{},{rate:1,range:3}],
  breath_beat:[{aoe:.5},{},{}],
- time_anchor:[{},{},{rate:.2}],
  arc_link:[{atk:4},{},{rate:1}],
  support_hotline:[{rate:2},{},{}],
  resonance_net:[{atk:10},{},{}],
@@ -980,6 +990,15 @@ function getCurrentSlowMul(e){
  if((e.slow || 0) <= 0) return 1;
  return getEffectiveSlowMul(e, e.rawSlowMul || e.slowMul || 1);
 }
+function applyStun(e, duration, cooldown=0){
+ if(!e || !state?.enemies?.includes(e)) return;
+ const dur = Math.max(0, Number(duration) || 0);
+ const cd = Math.max(0, Number(cooldown) || 0);
+ if(dur <= 0) return;
+ if(cd > 0 && (e.stunResistTimer || 0) > 0) return;
+ e.stun = Math.max(Number(e.stun) || 0, dur);
+ if(cd > 0) e.stunResistTimer = Math.max(Number(e.stunResistTimer) || 0, cd);
+}
 
 function setVulnerability(e, amount, duration){
  e.vuln = Math.max(e.vuln || 0, amount);
@@ -1036,6 +1055,28 @@ function applyEndOfWaveTowerEffects(){
  return result;
 }
 
+function clearBattleTransientState(){
+ // Clean up all battle-only/selection states before returning to daytime.
+ state.enemies = [];
+ state.projectiles = [];
+ state.fx = [];
+ state.spawner = null;
+ state.waveRoutePlan = null;
+ state.selectedRouteIndex = null;
+ state.selectedTowerId = null;
+ state.selectedShopTowerId = null;
+ state.selectedPlaced = null;
+ state.placedTowers.forEach(t=>{
+   t.cool = 0;
+   t.disabled = 0;
+   t.shotCount = 0;
+   t.lastTargetId = null;
+   t.focusStacks = 0;
+   t.pulseCount = 0;
+ });
+ updateNearPrompt();
+}
+
 function applyTowerHit(tower, enemy, baseDamage){
  if(!state.enemies.includes(enemy)) return;
  const id = tower.def.id;
@@ -1055,9 +1096,8 @@ function applyTowerHit(tower, enemy, baseDamage){
  if(id === 'breath_beat'){
   applySlow(enemy, lv>=2 ? 0.50 : 0.75, 2.5);
   tower.pulseCount = (tower.pulseCount || 0) + 1;
-  if(lv>=3 && tower.pulseCount % 3 === 0) enemy.stun = Math.max(enemy.stun || 0, enemy.def.size==='boss' ? .6 : 1.2);
+  if(lv>=3 && tower.pulseCount % 3 === 0) applyStun(enemy, enemy.def.size==='boss' ? .6 : 1.2, enemy.def.size==='boss' ? 2.0 : 1.2);
  }
- if(id === 'time_anchor') enemy.stun = Math.max(enemy.stun || 0, (enemy.def.size==='boss' ? .25 : .55) + (lv>=1?.2:0) + (lv>=2?.2:0));
  if(id === 'resonance_net'){
   const perBuff = lv>=3 ? 0.25 : lv>=2 ? 0.20 : 0.10;
   dmg *= 1 + (state.activeBuffIds.length || 0) * perBuff;
@@ -1356,7 +1396,18 @@ function nearestBuilding(){
  return best;
 }
 
+function recoverPostWaveIfModalWasClosed(){
+ if(!state) return;
+ const modalHidden = document.getElementById('modal').classList.contains('hidden');
+ if(state.phase === 'reward' && modalHidden && (!state.enemies || state.enemies.length===0) && (!state.projectiles || state.projectiles.length===0) && !state.spawner){
+   state.phase = 'day';
+   clearBattleTransientState();
+   updateAllUI();
+ }
+}
+
 document.addEventListener('keydown',e=>{
+ recoverPostWaveIfModalWasClosed();
  if(!document.getElementById('modal').classList.contains('hidden')) return;
  let dr=0,dc=0;
  if(['ArrowUp','w','W'].includes(e.key))dr=-1; if(['ArrowDown','s','S'].includes(e.key))dr=1;
@@ -1685,7 +1736,7 @@ function makeEnemy(id, opts={}){
  const enemy = {
   id:Math.random().toString(36).slice(2),type:id,def,hp,maxHp:hp,armor:def.armor||0,
   x:startX,y:startY,path,pi,progress:opts.progress ?? (pi/path.length),
-  slow:0,rawSlowMul:1,slowMul:1,stun:0,hitTimer:0,vuln:0,vulnTimer:0,marked:false,knockCd:0,
+  slow:0,rawSlowMul:1,slowMul:1,stun:0,stunResistTimer:0,hitTimer:0,vuln:0,vulnTimer:0,marked:false,knockCd:0,
   shield:opts.shield||0, stealth:0, abilityCd:0, enraged:false
  };
  if(id==='rational') enemy.abilityCd = 6;
@@ -1828,7 +1879,12 @@ function updateCombat(dt){
   if(e.slow>0){e.slow-=logicDt; if(e.slow<=0){e.rawSlowMul=1;e.slowMul=1;}}
   if(e.vulnTimer>0){e.vulnTimer-=logicDt; if(e.vulnTimer<=0){e.vuln=0;e.marked=false;}}
   if(e.knockCd>0) e.knockCd-=logicDt;
-  if(e.stun>0){e.stun-=logicDt; continue;}
+  if(e.stunResistTimer>0) e.stunResistTimer-=logicDt;
+  if(e.stun>0){
+    e.stun=Math.max(0, e.stun-logicDt);
+    if(e.hitTimer>0) e.hitTimer-=logicDt;
+    continue;
+  }
   if(e.hitTimer>0) e.hitTimer-=logicDt;
   if(e.pi>=e.path.length){ leakEnemy(e); continue; }
   
@@ -1939,7 +1995,6 @@ canvas.addEventListener('click',evt=>{
     const p=centerOf(g.r,g.c);
     state.placedTowers.push({uid:Date.now(), id:def.id, def, r:g.r,c:g.c,x:p.x,y:p.y,level:0,cool:0});
     // If this was the last copy, clear placement selection so the UI cannot get stuck
-    // in an out-of-stock tower state, which was most visible with Time Anchor Tower.
     if((state.towerInventory[def.id]||0)<=0){
       state.selectedTowerId=null;
       state.selectedPlaced=null;
@@ -2096,7 +2151,7 @@ function useTactic(id){
   } else if(id==='tr4'){
     addStress(-12);
   } else if(id==='tl1'){
-    state.enemies.forEach(e=>{ e.stun = Math.max(e.stun, e.def.size==='boss' ? 2 : 4); });
+    state.enemies.forEach(e=>{ applyStun(e, e.def.size==='boss' ? 2 : 4, 0); });
   } else if(id==='clear_tasks'){
     [...state.enemies].forEach(e=>damageEnemy(e, 35, null));
   } else if(id==='route_reconstruct'){
@@ -2214,12 +2269,7 @@ function enterNight(){
 function endWave(){
  if(state.phase!=='battle') return;
  state.phase='reward';
- state.enemies=[];
- state.projectiles=[];
- state.fx=[];
- state.waveRoutePlan=null;
- state.selectedRouteIndex=null;
- state.spawner=null;
+ clearBattleTransientState();
  const endEffects = applyEndOfWaveTowerEffects();
  const waveEventMods = state.currentWaveEventMods || defaultNextWaveMods();
  if(waveEventMods.winGoldBonus){ state.gold += waveEventMods.winGoldBonus; log(`Mind Event victory bonus: Gold +${waveEventMods.winGoldBonus}`); }
@@ -2246,6 +2296,7 @@ function endWave(){
    state.day++;
    state.wave++;
    state.phase='day';
+   clearBattleTransientState();
    state.mindEventTriggeredToday = false;
    state.daySnapshot = createSnapshot();
    updateAllUI();
@@ -2314,6 +2365,7 @@ function updateAllUI(lists=true){
  const wInfo=document.getElementById('waveInfoLeft');
  if((state.phase==='deploy' || state.phase==='battle') && WAVES[state.wave-1]){
    wInfo.innerHTML = renderWaveRouteInfo();
+   bindRouteGroupHandlers();
  } else {
    wInfo.innerHTML='';
    state.selectedRouteIndex = null;
